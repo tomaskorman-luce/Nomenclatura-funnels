@@ -352,12 +352,12 @@
             <th></th>
             <th class="col-head">PLP</th>
             <th class="col-head">PDP</th>
-            <th class="col-head">SEL</th>
+            <th class="col-head">CFG</th>
             <th class="col-head">TRA</th>
             <th class="col-head">XTR</th>
             <th class="col-head">PRE</th>
             <th class="col-head">CHK</th>
-            <th class="col-head">CFM</th>
+            <th class="col-head">WAI</th>
           </tr>
         </thead>
         <tbody id="matrix-body-raw"></tbody>
@@ -383,12 +383,12 @@
             <th></th>
             <th class="col-head">PLP</th>
             <th class="col-head">PDP</th>
-            <th class="col-head">SEL</th>
+            <th class="col-head">CFG</th>
             <th class="col-head">TRA</th>
             <th class="col-head">XTR</th>
             <th class="col-head">PRE</th>
             <th class="col-head">CHK</th>
-            <th class="col-head">CFM</th>
+            <th class="col-head">WAI</th>
           </tr>
         </thead>
         <tbody id="matrix-body"></tbody>
@@ -457,8 +457,8 @@
             <td class="lines-cell">CRU, GRV, PAQ, HOT (VUE no trackea este paso por separado)</td>
           </tr>
           <tr class="step-row">
-            <td><span class="code-badge">SEL</span></td>
-            <td class="name-cell">Selección / Configuración</td>
+            <td><span class="code-badge">CFG</span></td>
+            <td class="name-cell">Configuración</td>
             <td class="def-cell">Elegir cabina, habitación o fechas dentro de un producto ya abierto.</td>
             <td class="lines-cell">Cruceros, Grandes Viajes</td>
           </tr>
@@ -487,8 +487,8 @@
             <td class="lines-cell">Todas las líneas</td>
           </tr>
           <tr class="step-row">
-            <td><span class="code-badge">CFM</span></td>
-            <td class="name-cell">Confirmación / Wait</td>
+            <td><span class="code-badge">WAI</span></td>
+            <td class="name-cell">Wait</td>
             <td class="def-cell">Espera y confirmación tras el pago.</td>
             <td class="lines-cell">Todas las líneas</td>
           </tr>
@@ -575,18 +575,18 @@
     CRU: { label: 'Cruceros', rows: [
       ['CRU - 0-Searcher', 'Listado de resultados', 'PLP'],
       ['CRU - 1-Ficha crucero', 'Ficha de producto', 'PDP'],
-      ['CRU - 2-Disponibilidad', 'Selección/Configuración', 'SEL'],
+      ['CRU - 2-Disponibilidad', 'Configuración', 'CFG'],
       ['CRU - 3-Presupuesto', 'Presupuesto', 'PRE'],
       ['CRU - 4-Checkout', 'Checkout', 'CHK'],
-      ['CRU - 5-Wait', 'Confirmación/Wait', 'CFM']
+      ['CRU - 5-Wait', 'Wait', 'WAI']
     ]},
     GRV: { label: 'Grandes Viajes', rows: [
       ['GV - 0-Listado de producto', 'Listado de resultados', 'PLP'],
       ['GV - 1-Ficha producto', 'Ficha de producto', 'PDP'],
-      ['GV - 2-Disponibilidad', 'Selección/Configuración', 'SEL'],
+      ['GV - 2-Disponibilidad', 'Configuración', 'CFG'],
       ['GV - 3-Presupuesto', 'Presupuesto', 'PRE'],
       ['GV - 4-Checkout', 'Checkout', 'CHK'],
-      ['GV - 5-Wait', 'Confirmación/Wait', 'CFM']
+      ['GV - 5-Wait', 'Wait', 'WAI']
     ]},
     PAQ: { label: 'Vuelo + Hotel', rows: [
       ['PAQ - V+H - 1-Disponibilidad', 'Listado de resultados', 'PLP'],
@@ -595,33 +595,33 @@
       ['PAQ - V+H - 4-Extras', 'Extras', 'XTR'],
       ['PAQ - V+H - 5-Presupuesto', 'Presupuesto', 'PRE'],
       ['PAQ - V+H - 6-Checkout', 'Checkout', 'CHK'],
-      ['PAQ - V+H - 7-Wait', 'Confirmación/Wait', 'CFM']
+      ['PAQ - V+H - 7-Wait', 'Wait', 'WAI']
     ]},
     VUE: { label: 'Vuelos', rows: [
       ['TRX - Vuelos - 1-Disponibilidad', 'Listado de resultados', 'PLP'],
       ['TRX - Vuelos - 2-Presupuesto', 'Presupuesto', 'PRE'],
       ['TRX - Vuelos - 3-Checkout', 'Checkout', 'CHK'],
-      ['TRX - Vuelos - 4-Wait', 'Confirmación/Wait', 'CFM']
+      ['TRX - Vuelos - 4-Wait', 'Wait', 'WAI']
     ]},
     HOT: { label: 'Hoteles', rows: [
       ['HOT - 0 - Disponibilidad', 'Listado de resultados', 'PLP'],
       ['HOT - 1 - Ficha hotel', 'Ficha de producto', 'PDP'],
       ['HOT - 2 - Checkout', 'Checkout', 'CHK'],
-      ['HOT - 3 - Wait', 'Confirmación/Wait', 'CFM']
+      ['HOT - 3 - Wait', 'Wait', 'WAI']
     ]}
   };
 
-  var CANONICAL = ['PLP', 'PDP', 'SEL', 'TRA', 'XTR', 'PRE', 'CHK', 'CFM'];
-  var SHORT_LABEL = { PLP: 'Listado', PDP: 'Ficha', SEL: 'Selección', TRA: 'Transporte', XTR: 'Extras', PRE: 'Presupuesto', CHK: 'Checkout', CFM: 'Confirmación' };
+  var CANONICAL = ['PLP', 'PDP', 'CFG', 'TRA', 'XTR', 'PRE', 'CHK', 'WAI'];
+  var SHORT_LABEL = { PLP: 'Listado', PDP: 'Ficha', CFG: 'Configuración', TRA: 'Transporte', XTR: 'Extras', PRE: 'Presupuesto', CHK: 'Checkout', WAI: 'Wait' };
   var DEFINITION = {
     PLP: 'Listado de productos/opciones tras una búsqueda (incluye el searcher de Cruceros).',
     PDP: 'Ficha de detalle de un crucero/paquete/hotel concreto.',
-    SEL: 'Elegir cabina, habitación o fechas dentro de un producto ya abierto.',
+    CFG: 'Elegir cabina, habitación o fechas dentro de un producto ya abierto.',
     TRA: 'Elegir vuelo/transporte dentro de un paquete.',
     XTR: 'Complementos o add-ons del paquete.',
     PRE: 'Resumen o carrito antes de pagar.',
     CHK: 'Pago y datos del cliente.',
-    CFM: 'Espera y confirmación tras el pago.'
+    WAI: 'Espera tras el pago.'
   };
   var OPTIONAL_PLP_LINES = { CRU: true, GRV: true, PAQ: true };
   var ORDER = ['CRU', 'GRV', 'PAQ', 'VUE', 'HOT'];
@@ -712,8 +712,8 @@
     ], selected: ['ALL'] },
     { id: 'pagina', label: 'Página', options: [
       ['ALL', 'Todas'], ['HOM', 'Home'], ['ESC', 'Escaparate'], ['CHO', 'Chollos'], ['PLP', 'Listado'],
-      ['PDP', 'Ficha producto'], ['SEL', 'Selección'], ['TRA', 'Transporte'], ['XTR', 'Extras'],
-      ['PRE', 'Presupuesto'], ['CHK', 'Checkout'], ['CFM', 'Confirmación']
+      ['PDP', 'Ficha producto'], ['CFG', 'Configuración'], ['TRA', 'Transporte'], ['XTR', 'Extras'],
+      ['PRE', 'Presupuesto'], ['CHK', 'Checkout'], ['WAI', 'Wait']
     ], selected: ['PDP'] },
     { id: 'pais', label: 'País', options: [
       ['ALL', 'Todos'], ['ES', 'España'], ['PT', 'Portugal'], ['IT', 'Italia'], ['FR', 'Francia'], ['DE', 'Alemania']
