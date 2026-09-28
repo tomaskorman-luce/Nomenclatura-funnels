@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Propuesta de homogeneización de funnels — Logitravel</title>
+<title>Propuesta de estandarización de funnels — Logitravel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -283,7 +283,7 @@
 
   <header class="hero">
     <div class="eyebrow">Logitravel · CRO / UX Research</div>
-    <h1>Homogeneización de nombres de funnel &amp; codificación de 3 letras</h1>
+    <h1>Estandarización de nombres de funnel &amp; codificación de 3 letras</h1>
     <p class="sub">Propuesta consolidada sobre las líneas de negocio ya documentadas (el diccionario queda abierto a incorporar más líneas): diccionario de páginas, vista comparativa de los funnels, y el código de 5 partes para nombrar tests A/B, estudios UX y trackers de AB Tasty.</p>
     <div class="pill-row">
       <span class="pill">11 códigos de página</span>
@@ -295,7 +295,7 @@
   <!-- WHY IT MATTERS -->
   <section>
     <div class="section-head">
-      <div class="kicker">01 · Por qué homogeneizar</div>
+      <div class="kicker">01 · Por qué estandarizar</div>
       <h2>5 razones para invertir en un vocabulario común</h2>
       <p>No es un ejercicio de estética de nombres: cada punto de abajo es una capacidad concreta que hoy cuesta más de lo necesario porque cada línea de negocio nombra sus pasos a su manera.</p>
     </div>
@@ -341,7 +341,7 @@
   <!-- FRAGMENTATION "BEFORE" MATRIX -->
   <section>
     <div class="section-head">
-      <div class="kicker">02 · Situación actual: nombres sin homogeneizar</div>
+      <div class="kicker">02 · Situación actual: nombres sin estandarizar</div>
       <h2>Los funnels hoy</h2>
       <p>Misma estructura que la vista comparativa de la sección 03, pero con el texto tal como existe hoy en cada línea. La columna de cada paso agrupa nombres que no son iguales entre sí ni siguen un patrón común — esa es la deunificación que la propuesta busca resolver.</p>
     </div>
@@ -365,16 +365,16 @@
       <div class="matrix-note">
         <span><span class="swatch"></span> celda vacía = ese paso no existe en esa línea</span>
       </div>
-      <p class="hint-hover">💡 El código pequeño bajo cada nombre es el código de 3 letras que se propone en la sección 04 — para comparar de un vistazo con la vista homogeneizada.</p>
+      <p class="hint-hover">💡 El código pequeño bajo cada nombre es el código de 3 letras que se propone en la sección 04 — para comparar de un vistazo con la vista estandarizada.</p>
     </div>
   </section>
 
   <!-- HORIZONTAL FUNNEL MATRIX -->
   <section>
     <div class="section-head">
-      <div class="kicker">03 · Situación actual: nombres estandarizados</div>
+      <div class="kicker">03 · Propuesta: nombres estandarizados</div>
       <h2>Los 5 funnels principales, ahora equivalentes</h2>
-      <p>Cada fila es una línea de negocio; cada columna, un paso canónico del funnel homogeneizado. Una celda vacía indica que esa línea no tiene ese paso (ej. Vuelos no trackea Ficha de producto por separado; Hoteles no trackea Presupuesto). Pasa el ratón sobre una celda para ver la definición del paso.</p>
+      <p>Cada fila es una línea de negocio; cada columna, un paso canónico del funnel estandarizado. Una celda vacía indica que esa línea no tiene ese paso (ej. Vuelos no trackea Ficha de producto por separado; Hoteles no trackea Presupuesto). Pasa el ratón sobre una celda para ver la definición del paso.</p>
     </div>
     <div class="card matrix-card">
       <table class="matrix-table" id="matrix-table">
@@ -406,7 +406,7 @@
     <div class="section-head">
       <div class="kicker">04 · Diccionario de páginas</div>
       <h2>11 códigos de funnel de 3 letras cubren todas las líneas de negocio</h2>
-      <p>HOM/ESC/CHO son puntos de entrada previos al funnel trackeado (no forman parte de la secuencia numerada por línea); el resto son los pasos del funnel homogeneizado.</p>
+      <p>HOM/ESC/CHO son puntos de entrada previos al funnel trackeado (no forman parte de la secuencia numerada por línea); el resto son los pasos del funnel estandarizado.</p>
     </div>
     <div class="card dict-table-card">
       <div class="dict-legend">
@@ -829,6 +829,72 @@
     var original = btn.textContent;
     btn.textContent = 'Copiado ✓';
     setTimeout(function () { btn.textContent = original; }, 1400);
+  });
+})();
+</script>
+
+<!-- ---- Local edit mode: only shown when opened from localhost/file, never on the public GitHub Pages URL ---- -->
+<style>
+  #edit-toggle {
+    position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+    background: #161916; color: #fff; border: none; border-radius: 9999px;
+    padding: 12px 18px; font-family: "Roboto", system-ui, sans-serif; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; box-shadow: 0 8px 22px rgba(11,11,11,0.28); display: none;
+  }
+  #edit-toggle.shown { display: inline-flex; align-items: center; gap: 8px; }
+  #edit-save {
+    position: fixed; bottom: 20px; right: 190px; z-index: 1000;
+    background: var(--brand); color: #fff; border: none; border-radius: 9999px;
+    padding: 12px 18px; font-family: "Roboto", system-ui, sans-serif; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; box-shadow: 0 8px 22px rgba(11,11,11,0.28); display: none;
+  }
+  body.edit-mode #edit-save { display: inline-flex; align-items: center; gap: 8px; }
+  body.edit-mode [data-editable] { outline: 1.5px dashed transparent; border-radius: 4px; transition: outline-color .12s, background .12s; cursor: text; }
+  body.edit-mode [data-editable]:hover { outline-color: var(--brand); background: rgba(0,85,145,0.06); }
+  body.edit-mode [data-editable]:focus { outline-color: var(--brand); outline-style: solid; background: rgba(0,85,145,0.08); }
+</style>
+<button id="edit-toggle" type="button">✏️ Editar</button>
+<button id="edit-save" type="button">💾 Copiar HTML</button>
+<script>
+(function () {
+  var isLocal = ['localhost', '127.0.0.1', ''].indexOf(location.hostname) !== -1;
+  if (!isLocal) return; // nunca se activa en la URL pública de GitHub Pages
+
+  var toggleBtn = document.getElementById('edit-toggle');
+  var saveBtn = document.getElementById('edit-save');
+  toggleBtn.classList.add('shown');
+
+  var EDITABLE_SELECTOR = 'h1, h2, h3, h4, p, li, td, th, .kicker, figcaption';
+  var editing = false;
+
+  function setEditable(on) {
+    document.querySelectorAll(EDITABLE_SELECTOR).forEach(function (el) {
+      el.setAttribute('contenteditable', on ? 'true' : 'false');
+      if (on) el.setAttribute('data-editable', '');
+      else el.removeAttribute('data-editable');
+    });
+  }
+
+  toggleBtn.addEventListener('click', function () {
+    editing = !editing;
+    document.body.classList.toggle('edit-mode', editing);
+    setEditable(editing);
+    toggleBtn.textContent = editing ? '✖ Salir de edición' : '✏️ Editar';
+  });
+
+  saveBtn.addEventListener('click', function () {
+    // Quita los atributos de edición antes de serializar, para no ensuciar el HTML exportado
+    setEditable(false);
+    document.body.classList.remove('edit-mode');
+    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(html);
+    }
+    var original = saveBtn.textContent;
+    saveBtn.textContent = 'Copiado ✓ — pégalo en el chat';
+    setTimeout(function () { saveBtn.textContent = original; }, 2200);
+    // Vuelve a activar edición si seguía activa antes de copiar
+    if (editing) { document.body.classList.add('edit-mode'); setEditable(true); }
   });
 })();
 </script>
