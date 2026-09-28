@@ -290,7 +290,7 @@
   <header class="hero">
     <div class="eyebrow">Logitravel · CRO / UX Research</div>
     <h1>Estandarización de nombres de funnel &amp; codificación de 3 letras</h1>
-    <p class="sub">Propuesta consolidada sobre las líneas de negocio ya documentadas (el diccionario queda abierto a incorporar más líneas): diccionario de páginas, vista comparativa de los funnels, y el código de 5 partes para nombrar tests A/B, estudios UX y trackers de AB Tasty.</p>
+    <p class="sub">Propuesta consolidada que incluye diccionario de páginas, vista comparativa de los funnels, y el código de 5 partes para nombrar tests A/B, estudios UX y trackers de AB Tasty.</p>
     <div class="pill-row">
       <span class="pill">11 códigos de página</span>
       <span class="pill">Código: SEGMENTO|DISPOSITIVO|LINEA|PAGINA|PAIS</span>
@@ -303,42 +303,42 @@
     <div class="section-head">
       <div class="kicker">01 · Por qué estandarizar</div>
       <h2>5 razones para invertir en un vocabulario común</h2>
-      <p>No es un ejercicio de estética de nombres: cada punto de abajo es una capacidad concreta que hoy cuesta más de lo necesario porque cada línea de negocio nombra sus pasos a su manera.</p>
+      <p>Cada punto hoy cuesta más de lo necesario porque cada línea de negocio nombra sus pasos a su manera.</p>
     </div>
     <div class="card why-card">
       <div class="why-item">
         <div class="why-num">1</div>
         <div class="why-body">
           <h4>Mejor asistencia de IA</h4>
-          <p>Sin diccionario, cualquier IA (o persona nueva) tiene que <b>inferir</b> qué significa cada nombre de paso — y puede inferir mal. Con el diccionario, la IA <b>consulta</b> una referencia fija en vez de adivinar: al analizar un funnel, al generar código de tracking (skill <code style="font-family: ui-monospace, monospace;">abtasty-codigo</code>), o al idear un test para replicarlo en otra línea.</p>
+          <p>Un vocabulario común permite a la IA interpretar los pasos sin tener que adivinarlos.</p>
         </div>
       </div>
       <div class="why-item">
         <div class="why-num">2</div>
         <div class="why-body">
           <h4>Matriz de implementaciones entre líneas</h4>
-          <p>Cuando un test se implementa en una línea, hay que evaluar extenderlo a las demás — y construir esa matriz (filas = tests, columnas = líneas) requiere que los pasos sean comparables entre sí. La vista comparativa de la sección 03 es literalmente el esqueleto de esa matriz.</p>
+          <p>Los pasos comparables facilitan replicar tests y analizar qué funciona en cada línea.</p>
         </div>
       </div>
       <div class="why-item">
         <div class="why-num">3</div>
         <div class="why-body">
           <h4>Facilita la consolidación del reporting y KPIs</h4>
-          <p>(ej: "se aumenta el Avance a PRE en un X%"). Con nombres distintos por línea, una frase así no se puede calcular de forma agregada sin remapear manualmente cada vez; con el código común, el KPI se define una sola vez y aplica a todas las líneas.</p>
+          <p>Un mismo código permite definir métricas una sola vez y aplicarlas a todas las líneas.</p>
         </div>
       </div>
       <div class="why-item">
         <div class="why-num">4</div>
         <div class="why-body">
-          <h4>"Disponibilidad" significa dos cosas distintas, generando confusión</h4>
-          <p>En Cruceros y Grandes Viajes es la configuración final del producto (después de la ficha); en Vuelos, Hoteles y Vuelo+Hotel es el listado de resultados (antes de la ficha). Cualquier análisis, test o consulta que use ese nombre sin más contexto corre el riesgo de comparar dos pasos que no son lo mismo.</p>
+          <h4>Comparaciones más fiables</h4>
+          <p>Cada nombre identifica el mismo momento del funnel en todas las líneas.</p>
         </div>
       </div>
       <div class="why-item">
         <div class="why-num">5</div>
         <div class="why-body">
-          <h4>Perdurabilidad del estándar y onboarding</h4>
-          <p>El diccionario no es solo para hoy: da continuidad al estándar frente a rediseños y cambios de plataforma, y acelera el onboarding de nuevas personas al equipo, que aprenden el vocabulario una vez en vez de línea por línea.</p>
+          <h4>Estándar y onboarding</h4>
+          <p>Un diccionario común facilita mantener el criterio y formar a nuevas personas del equipo.</p>
         </div>
       </div>
     </div>
@@ -349,7 +349,7 @@
     <div class="section-head">
       <div class="kicker">02 · Situación actual: nombres sin estandarizar</div>
       <h2>Los funnels hoy</h2>
-      <p>Misma estructura que la vista comparativa de la sección 03, pero con el texto tal como existe hoy en cada línea. La columna de cada paso agrupa nombres que no son iguales entre sí ni siguen un patrón común — esa es la deunificación que la propuesta busca resolver.</p>
+      <p>La columna de cada paso agrupa nombres que no son iguales entre sí ni siguen un patrón común — esa es la deunificación que la propuesta busca resolver.</p>
     </div>
     <div class="card matrix-card">
       <table class="matrix-table" id="matrix-table-raw">
@@ -380,7 +380,7 @@
     <div class="section-head">
       <div class="kicker">03 · Propuesta: nombres estandarizados</div>
       <h2>Los 5 funnels principales, ahora equivalentes</h2>
-      <p>Cada fila es una línea de negocio; cada columna, un paso canónico del funnel estandarizado. Una celda vacía indica que esa línea no tiene ese paso (ej. Vuelos no trackea Ficha de producto por separado; Hoteles no trackea Presupuesto). Pasa el ratón sobre una celda para ver la definición del paso.</p>
+      <p>Cada fila es una línea de negocio; cada columna, un paso canónico del funnel estandarizado. Una celda vacía indica que esa línea no tiene ese paso. Pasa el ratón sobre una celda para ver la definición del paso. <b>Criterio user-centric:</b> los nombres describen la experiencia o acción del usuario, no la estructura interna del negocio.</p>
     </div>
     <div class="card matrix-card">
       <table class="matrix-table" id="matrix-table">
@@ -412,7 +412,7 @@
     <div class="section-head">
       <div class="kicker">04 · Diccionario de páginas</div>
       <h2>11 códigos de funnel de 3 letras cubren todas las líneas de negocio</h2>
-      <p>HOM/ESC/CHO son puntos de entrada previos al funnel trackeado (no forman parte de la secuencia numerada por línea); el resto son los pasos del funnel estandarizado.</p>
+      <p>HOM/ESC/CHO son puntos de entrada previos al funnel trackeado (no forman parte de la secuencia numerada por línea); el resto son los pasos del funnel estandarizado. <b>Criterio user-centric:</b> los nombres describen lo que el usuario ve o hace, no cómo cada línea organiza internamente su proceso.</p>
     </div>
     <div class="card dict-table-card">
       <div class="dict-legend">
