@@ -869,10 +869,39 @@
 
   function setEditable(on) {
     document.querySelectorAll(EDITABLE_SELECTOR).forEach(function (el) {
-      el.setAttribute('contenteditable', on ? 'true' : 'false');
-      if (on) el.setAttribute('data-editable', '');
-      else el.removeAttribute('data-editable');
+      if (on) {
+        el.setAttribute('contenteditable', 'true');
+        el.setAttribute('data-editable', '');
+      } else {
+        el.removeAttribute('contenteditable');
+        el.removeAttribute('data-editable');
+      }
     });
+  }
+
+  function copyText(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () {
+        copyTextFallback(text, done);
+      });
+    } else {
+      copyTextFallback(text, done);
+    }
+  }
+
+  function copyTextFallback(text, done) {
+    var area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.left = '-9999px';
+    document.body.appendChild(area);
+    area.select();
+    var copied = false;
+    try { copied = document.execCommand('copy'); } catch (e) {}
+    area.remove();
+    if (copied) done();
+    else alert('No se pudo copiar automáticamente. Selecciona y copia el HTML desde el cuadro de texto.');
   }
 
   toggleBtn.addEventListener('click', function () {
@@ -887,12 +916,11 @@
     setEditable(false);
     document.body.classList.remove('edit-mode');
     var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(html);
-    }
     var original = saveBtn.textContent;
-    saveBtn.textContent = 'Copiado ✓ — pégalo en el chat';
-    setTimeout(function () { saveBtn.textContent = original; }, 2200);
+    copyText(html, function () {
+      saveBtn.textContent = 'Copiado ✓ — pégalo en el chat';
+      setTimeout(function () { saveBtn.textContent = original; }, 2200);
+    });
     // Vuelve a activar edición si seguía activa antes de copiar
     if (editing) { document.body.classList.add('edit-mode'); setEditable(true); }
   });
