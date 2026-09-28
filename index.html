@@ -149,6 +149,12 @@
   /* ---- Raw/original step cell (fragmentation "before" matrix) ---- */
   .step-cell-raw { min-height: 74px; align-items: flex-start; }
   .step-cell-raw .raw-name { font-size: 11.5px; font-weight: 700; line-height: 1.3; }
+  .step-cell-raw .owner-name {
+    display: block; margin-top: 5px; padding-top: 5px;
+    border-top: 1px solid rgba(255,255,255,0.28);
+    font-size: 11px; font-weight: 400; font-style: italic; line-height: 1.3; opacity: 0.95;
+  }
+  .step-cell-raw .owner-name::before { content: 'Owner: '; font-style: normal; font-weight: 700; opacity: 0.8; }
   .step-cell-raw .code-mini {
     display: inline-block; margin-top: 7px; font-family: ui-monospace, monospace;
     font-size: 10px; font-weight: 700; letter-spacing: 0.02em; opacity: 0.9;
@@ -515,7 +521,7 @@
         <ul>
           <li><b>Mejor asistencia de IA:</b> preguntar por <code>ALL|ALL|ALL|ALL</code> — "cambio de copy en el CTA" — obliga a la IA (o a cualquier persona) a adivinar en qué página ocurrió el test; con <code>ALL|ALL|ALL|PDP|ALL</code> la pregunta ya lleva la respuesta incorporada y el análisis o la réplica en otra línea es inmediata.</li>
           <li><b>Vista al vuelo:</b> con solo leer el nombre del test se entiende en qué página se ejecutó, sin tener que abrir la ficha del test o preguntarle a quien lo montó.</li>
-          <li><b>Tests más rápidos de nombrar y filtrar:</b> con un código estructurado, nombrar un test es elegir de una lista corta de opciones por posición, no redactar texto libre — y filtrar/agrupar tests por página en el reporting es una búsqueda exacta, no una búsqueda de texto.</li>
+          <li><b>Automatización en CRO Hub:</b> con el código creado mediante selectores, solo habrá que rellenar el nombre del test; el resto de campos relacionados se autorrellenará automáticamente a partir de los valores seleccionados.</li>
           <li><b>Evita colisiones de nombre:</b> dos tests corriendo a la vez en la misma línea y dispositivo pero en páginas distintas (ej. un cambio de CTA en PDP y otro en CHK) quedan claramente diferenciados en vez de competir por el mismo nombre genérico.</li>
         </ul>
       </div>
@@ -573,18 +579,18 @@
   // rows: [nombre original, nombre unificado, código]
   var DATA = {
     CRU: { label: 'Cruceros', rows: [
-      ['CRU - 0-Searcher', 'Listado de resultados', 'PLP'],
-      ['CRU - 1-Ficha crucero', 'Ficha de producto', 'PDP'],
-      ['CRU - 2-Disponibilidad', 'Configuración', 'CFG'],
-      ['CRU - 3-Presupuesto', 'Presupuesto', 'PRE'],
-      ['CRU - 4-Checkout', 'Checkout', 'CHK'],
-      ['CRU - 5-Wait', 'Wait', 'WAI']
+      ['CRU - 0-Searcher', 'Listado de resultados', 'PLP', 'Searcher'],
+      ['CRU - 1-Ficha crucero', 'Ficha de producto', 'PDP', 'Product'],
+      ['CRU - 2-Disponibilidad', 'Configuración', 'CFG', 'Quote'],
+      ['CRU - 3-Presupuesto', 'Presupuesto', 'PRE', 'Price Summary'],
+      ['CRU - 4-Checkout', 'Checkout', 'CHK', 'Checkout'],
+      ['CRU - 5-Wait', 'Wait', 'WAI', 'Thank You']
     ]},
     GRV: { label: 'Grandes Viajes', rows: [
       ['GV - 0-Listado de producto', 'Listado de resultados', 'PLP'],
       ['GV - 1-Ficha producto', 'Ficha de producto', 'PDP'],
-      ['GV - 2-Disponibilidad', 'Configuración', 'CFG'],
-      ['GV - 3-Presupuesto', 'Presupuesto', 'PRE'],
+      ['GV - 2-Disponibilidad', 'Configuración', 'CFG', 'Booking details'],
+      ['GV - 3-Presupuesto', 'Presupuesto', 'PRE', 'Presentación de precio'],
       ['GV - 4-Checkout', 'Checkout', 'CHK'],
       ['GV - 5-Wait', 'Wait', 'WAI']
     ]},
@@ -688,6 +694,7 @@
         td.innerHTML =
           '<div class="step-cell step-cell-raw" style="background:' + LINE_COLOR[key] + '; color:' + LINE_INK[key] + ';">' +
             '<span class="raw-name">' + row[0] + '</span>' +
+            (row[3] ? '<span class="owner-name">' + row[3] + '</span>' : '') +
             '<span class="code-mini">' + code + '</span>' +
           '</div>';
       } else {
