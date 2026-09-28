@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta de homogeneización de funnels — Logitravel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border-ring:    rgba(11,11,11,0.10);
+
+    /* categorical — asignación fija por línea de negocio, en el orden documentado */
+    --line-cru: #2a78d6; /* blue */
+    --line-grv: #eb6834; /* orange */
+    --line-paq: #1baf7a; /* aqua */
+    --line-vue: #eda100; /* yellow */
+    --line-hot: #e87ba4; /* magenta */
+
+    /* color de texto legible sobre cada fill, elegido por luminancia del hue */
+    --line-cru-ink: #ffffff;
+    --line-grv-ink: #ffffff;
+    --line-paq-ink: #ffffff;
+    --line-vue-ink: #161916;
+    --line-hot-ink: #161916;
+
+    --brand: #005591; /* marca Logitravel, solo para chrome/UI, nunca como color de dato */
+    --brand-subtle: #def0fc;
+
+    --good: #0ca30c;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 24px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3 { font-family: "Poppins", system-ui, sans-serif; font-weight: 600; margin: 0; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  header.hero {
+    background: linear-gradient(135deg, var(--brand) 0%, #003366 100%);
+    color: #fff;
+    border-radius: var(--radius-xl);
+    padding: 40px 44px;
+    margin-bottom: 32px;
+  }
+  header.hero .eyebrow {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #cfe6f8;
+    margin-bottom: 10px;
+  }
+  header.hero h1 { font-size: 30px; color: #fff; max-width: 720px; }
+  header.hero p.sub { color: #dcebf6; max-width: 660px; margin-top: 12px; font-size: 15px; }
+  .pill-row { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.24);
+    color: #fff; font-size: 12.5px; font-weight: 500;
+    padding: 6px 12px; border-radius: 9999px;
+  }
+  .pill.status { background: #fff; color: #a06600; border-color: transparent; }
+  .pill.status .dot { width: 8px; height: 8px; border-radius: 50%; background: #eda100; }
+
+  section { margin-bottom: 40px; }
+  section .section-head { margin-bottom: 18px; }
+  section .section-head .kicker {
+    font-size: 12.5px; font-weight: 700; color: var(--brand);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+  }
+  section h2 { font-size: 21px; }
+  section .section-head p { color: var(--text-secondary); font-size: 14.5px; margin-top: 6px; max-width: 780px; }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-ring);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 2px rgba(11,11,11,0.04);
+  }
+
+  /* ---- Horizontal funnel matrix ---- */
+  .matrix-card { padding: 24px; overflow-x: auto; }
+  .matrix-table { border-collapse: separate; border-spacing: 6px; width: 100%; min-width: 980px; }
+  .matrix-table th { text-align: left; padding: 0 6px 10px; }
+  .matrix-table th.col-head {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-muted); text-align: center;
+  }
+  .row-head { width: 168px; vertical-align: middle; }
+  .row-head-inner {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--radius-md);
+  }
+  .row-head-code {
+    font-family: ui-monospace, monospace; font-weight: 800; font-size: 15px;
+    color: #fff; padding: 4px 9px; border-radius: 6px; letter-spacing: 0.02em;
+  }
+  .row-head-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .matrix-table td.cell { padding: 0; vertical-align: top; }
+  .step-cell {
+    min-width: 108px; min-height: 74px;
+    border-radius: var(--radius-md);
+    padding: 9px 10px;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative;
+  }
+  .step-cell .code { font-family: ui-monospace, monospace; font-weight: 800; font-size: 15px; letter-spacing: 0.02em; }
+  .step-cell .label { font-size: 11px; font-weight: 500; margin-top: 2px; opacity: 0.92; }
+  .step-cell.empty {
+    background: transparent; border: 1.5px dashed var(--gridline);
+    align-items: center; text-align: center;
+  }
+  .step-cell.empty .label { color: var(--text-muted); font-size: 11px; margin: 0; opacity: 1; }
+  .opt-flag {
+    position: absolute; top: -8px; right: -6px;
+    background: #fff; color: #a06600; border: 1px solid #f3e2ac;
+    font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 9999px; box-shadow: 0 1px 2px rgba(11,11,11,0.12);
+  }
+  .matrix-note {
+    display: flex; gap: 18px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid var(--gridline); font-size: 12px; color: var(--text-secondary);
+  }
+  .matrix-note span { display: inline-flex; align-items: center; gap: 6px; }
+  .matrix-note .swatch { width: 10px; height: 10px; border-radius: 3px; border: 1.5px dashed var(--gridline); }
+  .hint-hover { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+
+  /* ---- Raw/original step cell (fragmentation "before" matrix) ---- */
+  .step-cell-raw { min-height: 74px; align-items: flex-start; }
+  .step-cell-raw .raw-name { font-size: 11.5px; font-weight: 700; line-height: 1.3; }
+  .step-cell-raw .code-mini {
+    display: inline-block; margin-top: 7px; font-family: ui-monospace, monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.02em; opacity: 0.9;
+    background: rgba(255,255,255,0.3); padding: 1px 6px; border-radius: 4px; width: fit-content;
+  }
+
+  /* ---- Why-it-matters list ---- */
+  .why-card { padding: 2px 10px; }
+  .why-item { display: flex; align-items: center; gap: 14px; padding: 9px 14px; border-bottom: 1px solid var(--gridline); }
+  .why-item:last-child { border-bottom: none; }
+  .why-num {
+    flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--brand-subtle); color: var(--brand);
+    font-family: "Poppins", sans-serif; font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .why-body h4 { font-size: 13.5px; margin-bottom: 2px; color: var(--text-primary); }
+  .why-body p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--text-secondary); }
+
+  /* ---- Segmentation extension rationale ---- */
+  .seg-why { padding: 22px 26px; margin-top: 16px; }
+  .seg-why h4 { font-size: 13.5px; margin-bottom: 12px; }
+  .seg-why ul { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--text-secondary); }
+  .seg-why li { margin-bottom: 10px; }
+  .seg-why li:last-child { margin-bottom: 0; }
+  .seg-why code { font-family: ui-monospace, monospace; background: var(--page-plane); border: 1px solid var(--gridline); border-radius: 4px; padding: 1px 5px; }
+
+  /* ---- Dictionary table ---- */
+  .dict-table-card { padding: 8px; overflow-x: auto; }
+  .dict-table { border-collapse: collapse; width: 100%; min-width: 880px; font-size: 13px; }
+  .dict-table thead th {
+    text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-muted);
+    padding: 10px 14px; border-bottom: 1.5px solid var(--gridline);
+    position: sticky; top: 0; background: var(--surface-1);
+  }
+  .dict-table tbody tr { border-bottom: 1px solid var(--gridline); }
+  .dict-table tbody tr:last-child { border-bottom: none; }
+  .dict-table tbody tr:hover { background: var(--page-plane); }
+  .dict-table tbody tr.entry-row td:first-child { border-left: 3px solid var(--text-muted); }
+  .dict-table tbody tr.step-row td:first-child { border-left: 3px solid var(--brand); }
+  .dict-table td { padding: 11px 14px; vertical-align: top; color: var(--text-secondary); }
+  .dict-table .code-badge {
+    display: inline-flex; font-family: ui-monospace, monospace; font-weight: 700; font-size: 12.5px;
+    color: #fff; background: var(--brand);
+    padding: 3px 9px; border-radius: 6px; letter-spacing: 0.02em; white-space: nowrap;
+  }
+  .entry-row .code-badge { background: var(--text-muted); }
+  .dict-table td.name-cell { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+  .dict-table td.def-cell { max-width: 340px; }
+  .dict-table td.lines-cell { font-size: 12px; color: var(--text-muted); max-width: 220px; }
+  .dict-table .note-inline { display: block; font-size: 11.5px; color: #a06600; background: #fff7db; border: 1px solid #f3e2ac; border-radius: 6px; padding: 4px 7px; margin-top: 5px; }
+  .dict-legend { display: flex; gap: 18px; flex-wrap: wrap; padding: 12px 14px 6px; font-size: 12px; color: var(--text-secondary); }
+  .dict-legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .dict-legend .swatch { width: 12px; height: 12px; border-radius: 3px; }
+  .dict-legend .swatch.entry { background: var(--text-muted); }
+  .dict-legend .swatch.step { background: var(--brand); }
+
+  /* ---- Segmentation builder ---- */
+  .builder { padding: 26px 28px; }
+  .builder-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+  .builder-field > label { display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .multiselect { position: relative; font-family: "Roboto", system-ui, sans-serif; }
+  .multiselect-trigger {
+    width: 100%; font-family: inherit; font-size: 13.5px; padding: 9px 10px;
+    border-radius: 8px; border: 1.5px solid var(--gridline); background: var(--page-plane); color: var(--text-primary);
+    cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 6px; text-align: left;
+  }
+  .multiselect-trigger .ms-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .multiselect-trigger .ms-caret { flex: 0 0 auto; font-size: 9px; color: var(--text-muted); transition: transform 0.15s; }
+  .multiselect.open .multiselect-trigger { border-color: var(--brand); background: var(--surface-1); }
+  .multiselect.open .ms-caret { transform: rotate(180deg); }
+  .multiselect-panel {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 30;
+    background: var(--surface-1); border: 1px solid var(--border-ring); border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(11,11,11,0.16); padding: 6px; max-height: 248px; overflow-y: auto;
+    display: none;
+  }
+  .multiselect.open .multiselect-panel { display: block; }
+  .ms-option {
+    display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500;
+    padding: 8px 9px; border-radius: 6px; cursor: pointer; color: var(--text-primary);
+    user-select: none;
+  }
+  .ms-option:hover { background: var(--page-plane); }
+  .ms-option .ms-box {
+    flex: 0 0 auto; width: 16px; height: 16px; border-radius: 4px;
+    border: 1.5px solid var(--gridline); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .ms-option .ms-box svg { width: 10px; height: 10px; opacity: 0; transform: scale(0.6); transition: opacity 0.12s, transform 0.12s; }
+  .ms-option input { display: none; }
+  .ms-option input:checked ~ .ms-box { background: var(--brand); border-color: var(--brand); }
+  .ms-option input:checked ~ .ms-box svg { opacity: 1; transform: scale(1); }
+  .ms-option .ms-text { color: var(--text-secondary); }
+  .ms-option .ms-text .ms-code { font-weight: 700; color: var(--text-primary); }
+  .ms-option .ms-text .ms-name { font-weight: 400; color: var(--text-secondary); }
+  .ms-option input:checked ~ .ms-text .ms-name { color: var(--text-primary); }
+  .builder-output {
+    background: #161916; color: #fff; border-radius: var(--radius-md);
+    padding: 16px 20px; font-family: ui-monospace, monospace; font-size: 18px; font-weight: 600;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .builder-output .parts span { padding: 0 2px; }
+  .copy-btn {
+    font-family: "Roboto", sans-serif; font-size: 12.5px; font-weight: 600;
+    background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 6px; padding: 6px 12px; cursor: pointer;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* ---- Tracker section ---- */
+  .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .tracker-card { padding: 20px 22px; }
+  .tracker-card h4 { font-size: 13.5px; margin-bottom: 10px; }
+  .tracker-pattern { font-family: ui-monospace, monospace; font-size: 13px; background: var(--page-plane); border: 1px solid var(--gridline); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
+  .tracker-example { font-size: 12.5px; color: var(--text-secondary); }
+  .tracker-example code { font-family: ui-monospace, monospace; background: var(--brand-subtle); color: #003366; padding: 1px 6px; border-radius: 4px; }
+  @media (max-width: 760px) { .tracker-grid { grid-template-columns: 1fr; } .builder-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  footer.next-steps {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    padding: 22px 28px; background: var(--brand-subtle); border-radius: var(--radius-lg);
+  }
+  footer.next-steps p { margin: 0; font-size: 13.5px; color: #003366; max-width: 640px; }
+  footer.next-steps .approve-badge { font-size: 12.5px; font-weight: 700; color: var(--brand); border: 1.5px solid var(--brand); padding: 8px 16px; border-radius: 9999px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Logitravel · CRO / UX Research</div>
+    <h1>Homogeneización de nombres de funnel &amp; codificación de 3 letras</h1>
+    <p class="sub">Propuesta consolidada sobre las líneas de negocio ya documentadas (el diccionario queda abierto a incorporar más líneas): diccionario de páginas, vista comparativa de los funnels, y el código de 5 partes para nombrar tests A/B, estudios UX y trackers de AB Tasty.</p>
+    <div class="pill-row">
+      <span class="pill">11 códigos de página</span>
+      <span class="pill">Código: SEGMENTO|DISPOSITIVO|LINEA|PAGINA|PAIS</span>
+      <span class="pill status"><span class="dot"></span>Pendiente de aprobación</span>
+    </div>
+  </header>
+
+  <!-- WHY IT MATTERS -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">01 · Por qué homogeneizar</div>
+      <h2>5 razones para invertir en un vocabulario común</h2>
+      <p>No es un ejercicio de estética de nombres: cada punto de abajo es una capacidad concreta que hoy cuesta más de lo necesario porque cada línea de negocio nombra sus pasos a su manera.</p>
+    </div>
+    <div class="card why-card">
+      <div class="why-item">
+        <div class="why-num">1</div>
+        <div class="why-body">
+          <h4>Mejor asistencia de IA</h4>
+          <p>Sin diccionario, cualquier IA (o persona nueva) tiene que <b>inferir</b> qué significa cada nombre de paso — y puede inferir mal. Con el diccionario, la IA <b>consulta</b> una referencia fija en vez de adivinar: al analizar un funnel, al generar código de tracking (skill <code style="font-family: ui-monospace, monospace;">abtasty-codigo</code>), o al idear un test para replicarlo en otra línea.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">2</div>
+        <div class="why-body">
+          <h4>Matriz de implementaciones entre líneas</h4>
+          <p>Cuando un test se implementa en una línea, hay que evaluar extenderlo a las demás — y construir esa matriz (filas = tests, columnas = líneas) requiere que los pasos sean comparables entre sí. La vista comparativa de la sección 03 es literalmente el esqueleto de esa matriz.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">3</div>
+        <div class="why-body">
+          <h4>Facilita la consolidación del reporting y KPIs</h4>
+          <p>(ej: "se aumenta el Avance a PRE en un X%"). Con nombres distintos por línea, una frase así no se puede calcular de forma agregada sin remapear manualmente cada vez; con el código común, el KPI se define una sola vez y aplica a todas las líneas.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">4</div>
+        <div class="why-body">
+          <h4>"Disponibilidad" significa dos cosas distintas, generando confusión</h4>
+          <p>En Cruceros y Grandes Viajes es la configuración final del producto (después de la ficha); en Vuelos, Hoteles y Vuelo+Hotel es el listado de resultados (antes de la ficha). Cualquier análisis, test o consulta que use ese nombre sin más contexto corre el riesgo de comparar dos pasos que no son lo mismo.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">5</div>
+        <div class="why-body">
+          <h4>Perdurabilidad del estándar y onboarding</h4>
+          <p>El diccionario no es solo para hoy: da continuidad al estándar frente a rediseños y cambios de plataforma, y acelera el onboarding de nuevas personas al equipo, que aprenden el vocabulario una vez en vez de línea por línea.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRAGMENTATION "BEFORE" MATRIX -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">02 · Situación actual: nombres sin homogeneizar</div>
+      <h2>Los mismos 5 funnels, hoy, con los nombres originales de cada línea</h2>
+      <p>Misma estructura que la vista comparativa de la sección 03, pero con el texto tal como existe hoy en cada línea. La columna de cada paso agrupa nombres que no son iguales entre sí ni siguen un patrón común — esa es la deunificación que la propuesta busca resolver.</p>
+    </div>
+    <div class="card matrix-card">
+      <table class="matrix-table" id="matrix-table-raw">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="col-head">PLP</th>
+            <th class="col-head">PDP</th>
+            <th class="col-head">SEL</th>
+            <th class="col-head">TRA</th>
+            <th class="col-head">XTR</th>
+            <th class="col-head">PRE</th>
+            <th class="col-head">CHK</th>
+            <th class="col-head">CFM</th>
+          </tr>
+        </thead>
+        <tbody id="matrix-body-raw"></tbody>
+      </table>
+      <div class="matrix-note">
+        <span><span class="swatch"></span> celda vacía = ese paso no existe en esa línea</span>
+      </div>
+      <p class="hint-hover">💡 El código pequeño bajo cada nombre es el código de 3 letras que se propone en la sección 04 — para comparar de un vistazo con la vista homogeneizada.</p>
+    </div>
+  </section>
+
+  <!-- HORIZONTAL FUNNEL MATRIX -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">03 · Vista comparativa de los funnels</div>
+      <h2>Los 5 funnels, paso a paso, en una sola vista horizontal</h2>
+      <p>Cada fila es una línea de negocio; cada columna, un paso canónico del funnel homogeneizado. Una celda vacía indica que esa línea no tiene ese paso (ej. Vuelos no trackea Ficha de producto por separado; Hoteles no trackea Presupuesto). Pasa el ratón sobre una celda para ver la definición del paso.</p>
+    </div>
+    <div class="card matrix-card">
+      <table class="matrix-table" id="matrix-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="col-head">PLP</th>
+            <th class="col-head">PDP</th>
+            <th class="col-head">SEL</th>
+            <th class="col-head">TRA</th>
+            <th class="col-head">XTR</th>
+            <th class="col-head">PRE</th>
+            <th class="col-head">CHK</th>
+            <th class="col-head">CFM</th>
+          </tr>
+        </thead>
+        <tbody id="matrix-body"></tbody>
+      </table>
+      <div class="matrix-note">
+        <span><span class="opt-flag" style="position:static;">Opc.</span> = paso opcional (hay entrada directa a PDP sin pasar por él)</span>
+        <span><span class="swatch"></span> celda vacía = ese paso no existe en esa línea</span>
+      </div>
+      <p class="hint-hover">💡 Pasa el cursor sobre cualquier código para ver la definición unificada de ese paso.</p>
+    </div>
+  </section>
+
+  <!-- DICTIONARY -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">04 · Diccionario de páginas</div>
+      <h2>11 códigos de funnel de 3 letras cubren todas las líneas de negocio</h2>
+      <p>HOM/ESC/CHO son puntos de entrada previos al funnel trackeado (no forman parte de la secuencia numerada por línea); el resto son los pasos del funnel homogeneizado.</p>
+    </div>
+    <div class="card dict-table-card">
+      <div class="dict-legend">
+        <span><span class="swatch entry"></span>Punto de entrada (HOM/ESC/CHO)</span>
+        <span><span class="swatch step"></span>Paso del funnel</span>
+      </div>
+      <table class="dict-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre unificado</th>
+            <th>Definición</th>
+            <th>Líneas donde aparece</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="entry-row">
+            <td><span class="code-badge">HOM</span></td>
+            <td class="name-cell">Home</td>
+            <td class="def-cell">Home del site. Buscador propio y productos destacados; salto directo a PDP posible.</td>
+            <td class="lines-cell">Todas las líneas · punto de entrada</td>
+          </tr>
+          <tr class="entry-row">
+            <td><span class="code-badge">ESC</span></td>
+            <td class="name-cell">Escaparate</td>
+            <td class="def-cell">Landing/buscador previo al listado (categoría o campaña).</td>
+            <td class="lines-cell">Todas las líneas · punto de entrada</td>
+          </tr>
+          <tr class="entry-row">
+            <td><span class="code-badge">CHO</span></td>
+            <td class="name-cell">Viajes Chollos</td>
+            <td class="def-cell">Landing de alto valor y tráfico que redirige directo a fichas de producto (PDP).</td>
+            <td class="lines-cell">Todas las líneas · punto de entrada</td>
+          </tr>
+          <tr class="step-row">
+            <td><span class="code-badge">PLP</span></td>
+            <td class="name-cell">Listado de resultados</td>
+            <td class="def-cell">
+              Listado de productos/opciones tras una búsqueda (incluye el searcher de Cruceros).
+              <span class="note-inline">Opcional en CRU/GRV/PAQ (entrada directa a PDP vía campañas/orgánico). Obligatorio en VUE/HOT.</span>
+            </td>
+            <td class="lines-cell">Cruceros, Grandes Viajes, Vuelo+Hotel, Vuelos, Hoteles</td>
+          </tr>
+          <tr class="step-row">
+            <td><span class="code-badge">PDP</span></td>
+            <td class="name-cell">Ficha de producto</td>
+            <td class="def-cell">Ficha de detalle de un crucero/paquete/hotel concreto.</td>
+            <td class="lines-cell">CRU, GRV, PAQ, HOT (VUE no trackea este paso por separado)</td>
+          </tr>
+          <tr class="step-row">
+            <td><span class="code-badge">SEL</span></td>
+            <td class="name-cell">Selección / Configuración</td>
+            <td class="def-cell">Elegir cabina, habitación o fechas dentro de un producto ya abierto.</td>
+            <td class="lines-cell">Cruceros, Grandes Viajes</td>
+          </tr>
+          <tr class="step-row">
+            <td><span class="code-badge">TRA</span></td>
+            <td class="name-cell">Selección de transporte</td>
+            <td class="def-cell">Elegir vuelo/transporte dentro de un paquete.</td>
+            <td class="lines-cell">Vuelo + Hotel</td>
+          </tr>
+          <tr class="step-row">
+            <td><span class="code-badge">XTR</span></td>
+            <td class="name-cell">Extras</td>
+            <td class="def-cell">Complementos o add-ons del paquete.</td>
+            <td class="lines-cell">Vuelo + Hotel</td>
+          </tr>
+          <tr class="step-row">
+            <td><span class="code-badge">PRE</span></td>
+            <td class="name-cell">Presupuesto</td>
+            <td class="def-cell">Resumen o carrito antes de pagar.</td>
+            <td class="lines-cell">Cruceros, Grandes Viajes, Vuelo+Hotel, Vuelos (Hoteles no trackea este paso)</td>
+          </tr>
+          <tr class="step-row">
+            <td><span class="code-badge">CHK</span></td>
+            <td class="name-cell">Checkout</td>
+            <td class="def-cell">Pago y datos del cliente.</td>
+            <td class="lines-cell">Todas las líneas</td>
+          </tr>
+          <tr class="step-row">
+            <td><span class="code-badge">CFM</span></td>
+            <td class="name-cell">Confirmación / Wait</td>
+            <td class="def-cell">Espera y confirmación tras el pago.</td>
+            <td class="lines-cell">Todas las líneas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SEGMENTATION BUILDER -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">05 · Código de segmentación (tests A/B · estudios UX)</div>
+      <h2>SEGMENTO | DISPOSITIVO | LINEA | PAGINA | PAIS</h2>
+      <p>Multiselección por posición, igual que en el uso real: cada campo admite varios valores separados por coma (ej. <code style="font-family: ui-monospace, monospace;">NEW|DES,TAB|CRU,GRV|PLP|PT,ES,FR</code>). Selecciona uno o varios valores en cada desplegable para ver el resultado exacto.</p>
+    </div>
+    <div class="card builder">
+      <div class="builder-grid" id="builder-grid"></div>
+      <div class="builder-output">
+        <span class="parts" id="builder-result">ALL|ALL|ALL|PDP|ALL</span>
+        <button class="copy-btn" id="copy-code">Copiar</button>
+      </div>
+      <div class="card seg-why">
+        <h4>¿Por qué añadir un 5º elemento (PAGINA) al código?</h4>
+        <ul>
+          <li><b>Mejor asistencia de IA:</b> preguntar por <code>ALL|ALL|ALL|ALL</code> — "cambio de copy en el CTA" — obliga a la IA (o a cualquier persona) a adivinar en qué página ocurrió el test; con <code>ALL|ALL|ALL|PDP|ALL</code> la pregunta ya lleva la respuesta incorporada y el análisis o la réplica en otra línea es inmediata.</li>
+          <li><b>Vista al vuelo:</b> con solo leer el nombre del test se entiende en qué página se ejecutó, sin tener que abrir la ficha del test o preguntarle a quien lo montó.</li>
+          <li><b>Tests más rápidos de nombrar y filtrar:</b> con un código estructurado, nombrar un test es elegir de una lista corta de opciones por posición, no redactar texto libre — y filtrar/agrupar tests por página en el reporting es una búsqueda exacta, no una búsqueda de texto.</li>
+          <li><b>Evita colisiones de nombre:</b> dos tests corriendo a la vez en la misma línea y dispositivo pero en páginas distintas (ej. un cambio de CTA en PDP y otro en CHK) quedan claramente diferenciados en vez de competir por el mismo nombre genérico.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRACKER CONVENTION -->
+  <section>
+    <div class="section-head">
+      <div class="kicker">06 · Convención de trackers (AB Tasty)</div>
+      <h2>Reutiliza los mismos códigos de línea y dispositivo</h2>
+      <p>El tracker de <code style="font-family: ui-monospace, monospace;">ABTastyClickTracking</code> mide una acción dentro de una variante ya montada — por eso no lleva página ni país: esa segmentación ya la aporta la campaña donde vive el tracker.</p>
+    </div>
+    <div class="tracker-grid">
+      <div class="card tracker-card">
+        <h4>Patrón</h4>
+        <div class="tracker-pattern">LINEA_NEGOCIO[_SUBLINEA] | DISPOSITIVO | ACCION - Nombre</div>
+        <p class="tracker-example">Ejemplos reales ya usados en cuenta: <code>PART_AE|ALL|CLIC - Copiar promocode</code> · <code>CRU|MOB|HOVER - Saldo monedero</code></p>
+      </div>
+      <div class="card tracker-card">
+        <h4>Reglas clave</h4>
+        <p class="tracker-example">
+          · El nombre va siempre <b>hardcodeado</b> como string literal fijo, nunca concatenado con datos que cambien (precio, código promo).<br>
+          · <b>ACCION</b> no se limita a <code>CLIC</code>: también <code>VIEW</code>, <code>HOVER</code>, etc.<br>
+          · Sin dedupe por defecto — AB Tasty ya separa visitantes de sesiones en su reporting.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="next-steps card">
+    <p><b>Siguiente paso:</b> una vez aprobada esta propuesta, se integra el diccionario de códigos y la convención de nombres en la skill <code style="font-family: ui-monospace, monospace;">abtasty-codigo</code> para que el código de tracking se genere ya con esta nomenclatura por defecto.</p>
+    <span class="approve-badge">Pendiente de aprobación</span>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var LINE_COLOR = {
+    CRU: 'var(--line-cru)',
+    GRV: 'var(--line-grv)',
+    PAQ: 'var(--line-paq)',
+    VUE: 'var(--line-vue)',
+    HOT: 'var(--line-hot)'
+  };
+  var LINE_INK = {
+    CRU: 'var(--line-cru-ink)',
+    GRV: 'var(--line-grv-ink)',
+    PAQ: 'var(--line-paq-ink)',
+    VUE: 'var(--line-vue-ink)',
+    HOT: 'var(--line-hot-ink)'
+  };
+
+  // rows: [nombre original, nombre unificado, código]
+  var DATA = {
+    CRU: { label: 'Cruceros', rows: [
+      ['CRU - 0-Searcher', 'Listado de resultados', 'PLP'],
+      ['CRU - 1-Ficha crucero', 'Ficha de producto', 'PDP'],
+      ['CRU - 2-Disponibilidad', 'Selección/Configuración', 'SEL'],
+      ['CRU - 3-Presupuesto', 'Presupuesto', 'PRE'],
+      ['CRU - 4-Checkout', 'Checkout', 'CHK'],
+      ['CRU - 5-Wait', 'Confirmación/Wait', 'CFM']
+    ]},
+    GRV: { label: 'Grandes Viajes', rows: [
+      ['GV - 0-Listado de producto', 'Listado de resultados', 'PLP'],
+      ['GV - 1-Ficha producto', 'Ficha de producto', 'PDP'],
+      ['GV - 2-Disponibilidad', 'Selección/Configuración', 'SEL'],
+      ['GV - 3-Presupuesto', 'Presupuesto', 'PRE'],
+      ['GV - 4-Checkout', 'Checkout', 'CHK'],
+      ['GV - 5-Wait', 'Confirmación/Wait', 'CFM']
+    ]},
+    PAQ: { label: 'Vuelo + Hotel', rows: [
+      ['PAQ - V+H - 1-Disponibilidad', 'Listado de resultados', 'PLP'],
+      ['PAQ - V+H - 2-Ficha hotel', 'Ficha de producto', 'PDP'],
+      ['PAQ - V+H - 3-Transporte', 'Selección de transporte', 'TRA'],
+      ['PAQ - V+H - 4-Extras', 'Extras', 'XTR'],
+      ['PAQ - V+H - 5-Presupuesto', 'Presupuesto', 'PRE'],
+      ['PAQ - V+H - 6-Checkout', 'Checkout', 'CHK'],
+      ['PAQ - V+H - 7-Wait', 'Confirmación/Wait', 'CFM']
+    ]},
+    VUE: { label: 'Vuelos', rows: [
+      ['TRX - Vuelos - 1-Disponibilidad', 'Listado de resultados', 'PLP'],
+      ['TRX - Vuelos - 2-Presupuesto', 'Presupuesto', 'PRE'],
+      ['TRX - Vuelos - 3-Checkout', 'Checkout', 'CHK'],
+      ['TRX - Vuelos - 4-Wait', 'Confirmación/Wait', 'CFM']
+    ]},
+    HOT: { label: 'Hoteles', rows: [
+      ['HOT - 0 - Disponibilidad', 'Listado de resultados', 'PLP'],
+      ['HOT - 1 - Ficha hotel', 'Ficha de producto', 'PDP'],
+      ['HOT - 2 - Checkout', 'Checkout', 'CHK'],
+      ['HOT - 3 - Wait', 'Confirmación/Wait', 'CFM']
+    ]}
+  };
+
+  var CANONICAL = ['PLP', 'PDP', 'SEL', 'TRA', 'XTR', 'PRE', 'CHK', 'CFM'];
+  var SHORT_LABEL = { PLP: 'Listado', PDP: 'Ficha', SEL: 'Selección', TRA: 'Transporte', XTR: 'Extras', PRE: 'Presupuesto', CHK: 'Checkout', CFM: 'Confirmación' };
+  var DEFINITION = {
+    PLP: 'Listado de productos/opciones tras una búsqueda (incluye el searcher de Cruceros).',
+    PDP: 'Ficha de detalle de un crucero/paquete/hotel concreto.',
+    SEL: 'Elegir cabina, habitación o fechas dentro de un producto ya abierto.',
+    TRA: 'Elegir vuelo/transporte dentro de un paquete.',
+    XTR: 'Complementos o add-ons del paquete.',
+    PRE: 'Resumen o carrito antes de pagar.',
+    CHK: 'Pago y datos del cliente.',
+    CFM: 'Espera y confirmación tras el pago.'
+  };
+  var OPTIONAL_PLP_LINES = { CRU: true, GRV: true, PAQ: true };
+  var ORDER = ['CRU', 'GRV', 'PAQ', 'VUE', 'HOT'];
+
+  var body = document.getElementById('matrix-body');
+  ORDER.forEach(function (key) {
+    var byCode = {};
+    DATA[key].rows.forEach(function (row) { byCode[row[2]] = row; });
+
+    var tr = document.createElement('tr');
+
+    var thRow = document.createElement('th');
+    thRow.className = 'row-head';
+    thRow.innerHTML =
+      '<div class="row-head-inner" style="background:' + LINE_COLOR[key] + '22;">' +
+        '<span class="row-head-code" style="background:' + LINE_COLOR[key] + '; color:' + LINE_INK[key] + ';">' + key + '</span>' +
+        '<span class="row-head-name">' + DATA[key].label + '</span>' +
+      '</div>';
+    tr.appendChild(thRow);
+
+    CANONICAL.forEach(function (code) {
+      var td = document.createElement('td');
+      td.className = 'cell';
+      var row = byCode[code];
+      if (row) {
+        var isOptionalPlp = code === 'PLP' && OPTIONAL_PLP_LINES[key];
+        td.innerHTML =
+          '<div class="step-cell" title="' + DEFINITION[code].replace(/"/g, '&quot;') + '" style="background:' + LINE_COLOR[key] + '; color:' + LINE_INK[key] + ';">' +
+            (isOptionalPlp ? '<span class="opt-flag">Opc.</span>' : '') +
+            '<span class="code">' + code + '</span>' +
+            '<span class="label">' + SHORT_LABEL[code] + '</span>' +
+          '</div>';
+      } else {
+        td.innerHTML = '<div class="step-cell empty"><span class="label">No aplica</span></div>';
+      }
+      tr.appendChild(td);
+    });
+
+    body.appendChild(tr);
+  });
+
+  // "Before" matrix — same layout, but showing the original/fragmented names
+  var bodyRaw = document.getElementById('matrix-body-raw');
+  ORDER.forEach(function (key) {
+    var byCode = {};
+    DATA[key].rows.forEach(function (row) { byCode[row[2]] = row; });
+
+    var tr = document.createElement('tr');
+
+    var thRow = document.createElement('th');
+    thRow.className = 'row-head';
+    thRow.innerHTML =
+      '<div class="row-head-inner" style="background:' + LINE_COLOR[key] + '22;">' +
+        '<span class="row-head-code" style="background:' + LINE_COLOR[key] + '; color:' + LINE_INK[key] + ';">' + key + '</span>' +
+        '<span class="row-head-name">' + DATA[key].label + '</span>' +
+      '</div>';
+    tr.appendChild(thRow);
+
+    CANONICAL.forEach(function (code) {
+      var td = document.createElement('td');
+      td.className = 'cell';
+      var row = byCode[code];
+      if (row) {
+        td.innerHTML =
+          '<div class="step-cell step-cell-raw" style="background:' + LINE_COLOR[key] + '; color:' + LINE_INK[key] + ';">' +
+            '<span class="raw-name">' + row[0] + '</span>' +
+            '<span class="code-mini">' + code + '</span>' +
+          '</div>';
+      } else {
+        td.innerHTML = '<div class="step-cell empty"><span class="label">No aplica</span></div>';
+      }
+      tr.appendChild(td);
+    });
+
+    bodyRaw.appendChild(tr);
+  });
+
+  // Segmentation builder — multiselect por posición, como en el uso real
+  var FIELDS = [
+    { id: 'segmento', label: 'Segmento', options: [
+      ['ALL', 'Todos'], ['NEW', 'Nuevo'], ['REC', 'Recurrente']
+    ], selected: ['ALL'] },
+    { id: 'dispositivo', label: 'Dispositivo', options: [
+      ['ALL', 'Todos'], ['DES', 'Desktop'], ['TAB', 'Tablet'], ['MOB', 'Mobile']
+    ], selected: ['ALL'] },
+    { id: 'linea', label: 'Línea', options: [
+      ['ALL', 'Todas'], ['CRU', 'Cruceros'], ['GRV', 'Grandes Viajes'], ['PAQ', 'Vuelo + Hotel'], ['VUE', 'Vuelos'], ['HOT', 'Hoteles']
+    ], selected: ['ALL'] },
+    { id: 'pagina', label: 'Página', options: [
+      ['ALL', 'Todas'], ['HOM', 'Home'], ['ESC', 'Escaparate'], ['CHO', 'Chollos'], ['PLP', 'Listado'],
+      ['PDP', 'Ficha producto'], ['SEL', 'Selección'], ['TRA', 'Transporte'], ['XTR', 'Extras'],
+      ['PRE', 'Presupuesto'], ['CHK', 'Checkout'], ['CFM', 'Confirmación']
+    ], selected: ['PDP'] },
+    { id: 'pais', label: 'País', options: [
+      ['ALL', 'Todos'], ['ES', 'España'], ['PT', 'Portugal'], ['IT', 'Italia'], ['FR', 'Francia'], ['DE', 'Alemania']
+    ], selected: ['ALL'] }
+  ];
+
+  var out = document.getElementById('builder-result');
+  var grid = document.getElementById('builder-grid');
+
+  function updateCode() {
+    out.textContent = FIELDS.map(function (f) { return f.selected.join(','); }).join('|');
+  }
+
+  function closeAllPanels(except) {
+    document.querySelectorAll('.multiselect.open').forEach(function (ms) {
+      if (ms !== except) ms.classList.remove('open');
+    });
+  }
+
+  FIELDS.forEach(function (field) {
+    var wrap = document.createElement('div');
+    wrap.className = 'builder-field';
+
+    var label = document.createElement('label');
+    label.textContent = field.label;
+    wrap.appendChild(label);
+
+    var ms = document.createElement('div');
+    ms.className = 'multiselect';
+
+    var trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'multiselect-trigger';
+    trigger.innerHTML = '<span class="ms-value"></span><span class="ms-caret">▾</span>';
+
+    var panel = document.createElement('div');
+    panel.className = 'multiselect-panel';
+
+    field.options.forEach(function (opt) {
+      var code = opt[0], name = opt[1];
+      var row = document.createElement('label');
+      row.className = 'ms-option';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = field.selected.indexOf(code) !== -1;
+      cb.addEventListener('change', function () {
+        if (cb.checked) {
+          if (code === 'ALL') {
+            // ALL es excluyente: deselecciona cualquier otro valor
+            field.selected = ['ALL'];
+          } else {
+            field.selected = field.selected.filter(function (c) { return c !== 'ALL'; });
+            if (field.selected.indexOf(code) === -1) field.selected.push(code);
+          }
+        } else {
+          field.selected = field.selected.filter(function (c) { return c !== code; });
+        }
+        if (field.selected.length === 0) {
+          field.selected = ['ALL'];
+        }
+        // Repinta todos los checkboxes de este campo para reflejar la exclusividad de ALL
+        field.options.forEach(function (o) {
+          var input = panel.querySelector('input[value="' + o[0] + '"]');
+          if (input) input.checked = field.selected.indexOf(o[0]) !== -1;
+        });
+        renderTrigger();
+        updateCode();
+      });
+      cb.value = code;
+      row.appendChild(cb);
+      var box = document.createElement('span');
+      box.className = 'ms-box';
+      box.innerHTML = '<svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      row.appendChild(box);
+      var txt = document.createElement('span');
+      txt.className = 'ms-text';
+      txt.innerHTML = '<span class="ms-code">' + code + '</span> — <span class="ms-name">' + name + '</span>';
+      row.appendChild(txt);
+      panel.appendChild(row);
+    });
+
+    // Los clicks dentro del panel no deben burbujear al listener global que cierra los desplegables
+    panel.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    function renderTrigger() {
+      trigger.querySelector('.ms-value').textContent = field.selected.join(', ');
+    }
+    renderTrigger();
+
+    trigger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var wasOpen = ms.classList.contains('open');
+      closeAllPanels();
+      ms.classList.toggle('open', !wasOpen);
+    });
+
+    ms.appendChild(trigger);
+    ms.appendChild(panel);
+    wrap.appendChild(ms);
+    grid.appendChild(wrap);
+  });
+
+  document.addEventListener('click', function () { closeAllPanels(); });
+
+  updateCode();
+
+  document.getElementById('copy-code').addEventListener('click', function () {
+    var text = out.textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text);
+    }
+    var btn = this;
+    var original = btn.textContent;
+    btn.textContent = 'Copiado ✓';
+    setTimeout(function () { btn.textContent = original; }, 1400);
+  });
+})();
+</script>
+</body>
+</html>
