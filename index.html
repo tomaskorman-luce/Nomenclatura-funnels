@@ -495,7 +495,7 @@
           <tr class="step-row">
             <td><span class="code-badge">WAI</span></td>
             <td class="name-cell">Wait</td>
-            <td class="def-cell">Espera y confirmación tras el pago.</td>
+            <td class="def-cell">Espera y confirmación tras la intención de pago. Puede derivar en confirmación (Thank You) o en error de pago (Payment error).</td>
             <td class="lines-cell">Todas las líneas</td>
           </tr>
         </tbody>
@@ -627,7 +627,7 @@
     XTR: 'Complementos o add-ons del paquete.',
     PRE: 'Resumen o carrito antes de pagar.',
     CHK: 'Pago y datos del cliente.',
-    WAI: 'Espera tras el pago.'
+    WAI: 'Espera y confirmación tras la intención de pago; puede derivar en confirmación (Thank You) o en error de pago.'
   };
   var OPTIONAL_PLP_LINES = { CRU: true, GRV: true, PAQ: true };
   var ORDER = ['CRU', 'GRV', 'PAQ', 'VUE', 'HOT'];
