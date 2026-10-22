@@ -466,7 +466,7 @@
     <div class="card sub-card">
       <div class="card-kicker">Partners</div>
       <h3>El partner va en el ID de la hipótesis; su funnel es el de cada línea que contrata</h3>
-      <p class="card-lead">Un partner no es una línea ni una sublínea: se identifica por el <b>prefijo del ID</b> de la hipótesis en CRO Hub (<code>LOGI-0253</code> → <code>MEL-0254</code>, <code>PAW-0256</code>), elegido con selector al crearla. En el código de segmentación el campo LINEA lleva la línea de producto con la nomenclatura de funnel de siempre (<code>PAQ_V+H</code>, <code>HOT</code>…), igual que en Logitravel. Cada partner tiene <b>una fila por línea contratada</b> (por ejemplo, Por Aventura tiene <code>PAQ_V+H</code> y <code>PAQ_T+H</code>; Balearia, <code>PAQ_F+H</code> y <code>HOT</code>), con el funnel de esa línea.</p>
+      <p class="card-lead">Un partner no es una línea ni una sublínea: se identifica por el <b>prefijo del ID</b> de la hipótesis en CRO Hub (<code>LOGI-0253</code> → <code>MEL-0254</code>, <code>PAW-0256</code>), elegido con selector al crearla. En el código de segmentación el campo LINEA lleva la línea de producto con la nomenclatura de funnel de siempre (<code>PAQ_V+H</code>, <code>HOT</code>…), igual que en Logitravel. Cada partner tiene <b>una fila por línea contratada</b> (por ejemplo, Por Aventura tiene <code>PAQ_V+H</code> y <code>PAQ_T+H</code>; Balearia, <code>PAQ_F+H</code> y <code>HOT</code>), con el funnel de esa línea. Cada partner tiene su propio color, para ver de un vistazo qué filas son suyas.</p>
       <table class="matrix-table wide" id="matrix-table-par">
         <thead id="thead-par"></thead>
         <tbody id="matrix-body-par"></tbody>
@@ -765,22 +765,22 @@
       { code: 'COC', name: 'Alquiler coches', url: 'logitravel.com/alquiler-coches/', steps: st('ESC PLP CHK WAI') },
       { code: 'FER', name: 'Ferries', url: 'logitravel.com/ferries/', steps: st('ESC PLP CHK WAI') }
     ]},
-    { line: 'HOM', name: 'Home', main: false, subs: [
+    { line: 'HOM', name: 'Home', main: false, tone: '#5f6b7a', subs: [
       { code: 'HOM', name: 'Home', url: 'logitravel.com', steps: st('ESC') }
     ]},
-    { line: 'CHO', name: 'Chollos', main: false, subs: [
+    { line: 'CHO', name: 'Chollos', main: false, tone: '#c0392b', subs: [
       { code: 'CHO', name: 'Chollos', url: 'logitravel.com/viajes-chollos/', steps: st('ESC') }
     ]},
-    { line: 'DIS', name: 'Disney', main: false, subs: [
+    { line: 'DIS', name: 'Disney', main: false, tone: '#1e3a8a', subs: [
       { code: 'DIS', name: 'Disney', url: 'logitravel.com/disney/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') }
     ]},
-    { line: 'EPA', name: 'Escapadas', main: false, subs: [
+    { line: 'EPA', name: 'Escapadas', main: false, tone: '#4d8f1f', subs: [
       { code: 'EPA', name: 'Escapadas', url: 'logitravel.com/escapadas/', steps: st('ESC PLP PDP XTR PRE CHK WAI') }
     ]},
-    { line: 'ACT', name: 'Actividades', main: false, subs: [
+    { line: 'ACT', name: 'Actividades', main: false, tone: '#0e8aa3', subs: [
       { code: 'ACT', name: 'Actividades', url: 'logitravel.com/actividades', steps: st('ESC PLP PDP CHK WAI') }
     ]},
-    { line: 'TRV', name: 'Transversales', main: false, subs: [
+    { line: 'TRV', name: 'Transversales', main: false, tone: '#6d28d9', subs: [
       { code: 'TRV', name: 'Transversales', url: '', steps: st('ESC PLP PDP CFG TRA XTR PRE CHK WAI') }
     ]},
     { line: 'HOT', name: 'Hoteles', main: true, subs: [
@@ -790,11 +790,11 @@
 
   // Partners: funnel heredado de las líneas contratadas (columna "Lineas contratadas por partners" del CSV, normalizada)
   var PARTNERS = [
-    { code: 'MEL', name: 'Melia', url: 'meliaescapes.melia.com', lines: ['PAQ_V+H'] },
-    { code: 'AIR', name: 'Air Europa', url: 'holidays.aireuropa.com', lines: ['PAQ_V+H'] },
-    { code: 'PAW', name: 'Por Aventura', url: 'holidays.portaventuraworld.com', lines: ['PAQ_V+H', 'PAQ_T+H'] },
-    { code: 'BAL', name: 'Balearia', url: 'baleando.balearia.com', lines: ['PAQ_F+H', 'HOT'] },
-    { code: 'ELB', name: 'Elba', url: 'holidays.hoteleselba.com', lines: ['PAQ_V+H'] }
+    { code: 'MEL', name: 'Melia', url: 'meliaescapes.melia.com', lines: ['PAQ_V+H'], tone: '#7a5cd6' },
+    { code: 'AIR', name: 'Air Europa', url: 'holidays.aireuropa.com', lines: ['PAQ_V+H'], tone: '#3d5bd9' },
+    { code: 'PAW', name: 'Por Aventura', url: 'holidays.portaventuraworld.com', lines: ['PAQ_V+H', 'PAQ_T+H'], tone: '#b83fb0' },
+    { code: 'BAL', name: 'Balearia', url: 'baleando.balearia.com', lines: ['PAQ_F+H', 'HOT'], tone: '#0f7fa8' },
+    { code: 'ELB', name: 'Elba', url: 'holidays.hoteleselba.com', lines: ['PAQ_V+H'], tone: '#a0522d' }
   ];
 
   // Liverpool no es partner sino otro negocio: va aparte y contrata todas las líneas
@@ -848,7 +848,9 @@
         var tip = (o.tips && o.tips[code]) ? DEFINITION[code] + ' · Procede de: ' + o.tips[code] : DEFINITION[code];
         td.innerHTML =
           '<div class="step-cell compact' + (o.inherited ? ' inherited' : '') + (o.biz ? ' biz' : '') + '" title="' + esc(tip) + '"' +
-            (o.inherited ? '' : ' style="background:' + o.color + '; color:' + o.ink + ';"') + '>' +
+            (o.tone
+              ? ' style="background:color-mix(in srgb, ' + o.tone + ' 13%, #fff); border-color:' + o.tone + '; color:color-mix(in srgb, ' + o.tone + ' 60%, #000);"'
+              : (o.inherited ? '' : ' style="background:' + o.color + '; color:' + o.ink + ';"')) + '>' +
             (o.optPlp && code === 'PLP' ? '<span class="opt-flag">Opc.</span>' : '') +
             '<span class="code">' + code + '</span>' +
             '<span class="label">' + SHORT_LABEL[code] + '</span>' +
@@ -880,7 +882,7 @@
       var gap = isFirst && (g.main ? !firstMain : !firstOth);
       var lineColorKey = g.main ? g.line : 'OTH';
       addRow(tbody, {
-        color: LINE_COLOR[lineColorKey], ink: LINE_INK[lineColorKey],
+        color: g.tone || LINE_COLOR[lineColorKey], ink: g.tone ? '#ffffff' : LINE_INK[lineColorKey],
         chip: key, name: sub.name, sub: multi ? g.name : '',
         badge: sub.star ? '<span class="chip">Principal</span>' : '',
         title: sub.url ? 'https://www.' + sub.url : '',
@@ -896,7 +898,7 @@
   PARTNERS.forEach(function (p, pi) {
     p.lines.forEach(function (k, i) {
       addRow(bodyPar, {
-        color: LINE_COLOR.PAR, ink: LINE_INK.PAR,
+        color: p.tone, ink: '#ffffff', tone: p.tone,
         chip: p.code + '-', name: p.name, sub: k + ' · ' + NAME_BY_KEY[k],
         title: p.url ? 'https://' + p.url : '',
         badge: i === 0 && p.lines.length > 1 ? '<span class="chip">' + p.lines.length + ' líneas</span>' : '',
