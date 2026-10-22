@@ -152,6 +152,15 @@
   /* Columnas de paso con el mismo ancho en todas las matrices expandidas */
   .matrix-table.wide { table-layout: fixed; }
   .matrix-table.wide th.row-head-wide { width: 190px; }
+  /* Cabeceras fijas al hacer scroll, hasta el final de cada tabla. El shadow rellena los huecos del border-spacing para que no asome el contenido */
+  .matrix-table thead th {
+    position: sticky; top: 0; z-index: 5; background: var(--surface-1);
+    box-shadow: 0 0 0 3px var(--surface-1), 0 6px 0 var(--surface-1);
+  }
+  /* overflow-x:auto convertiría la tarjeta en contenedor de scroll y rompería el sticky; con ancho suficiente no hace falta scroll horizontal */
+  @media (min-width: 1100px) {
+    .card.matrix-card, .card.sub-card { overflow-x: clip; }
+  }
   .col-chip { background: #0f172a; color: #fff; border-radius: 8px; padding: 9px 6px; text-align: center; line-height: 1.25; }
   .col-chip .cc-code { display: block; font-weight: 800; font-size: 13px; letter-spacing: 0.03em; text-transform: none; }
   .col-chip .cc-name { display: block; font-weight: 500; font-size: 11px; opacity: 0.9; text-transform: none; letter-spacing: 0; }
