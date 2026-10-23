@@ -34,7 +34,7 @@
     --line-vue-ink: #161916;
     --line-hot-ink: #161916;
 
-    /* líneas añadidas con las sublíneas: partnerships y "otras líneas" (DIS, EPA, ACT, HOM, CHO) */
+    /* líneas añadidas con las sublíneas: partnerships y bloque de entradas/transversales (HOM, CHO, TRV) */
     --line-par: #7a5cd6;
     --line-par-soft: #efeafc;
     --line-par-ink: #ffffff;
@@ -155,7 +155,7 @@
   .matrix-table th.col-th { padding: 0 0 10px; }
   /* Columnas de paso con el mismo ancho en todas las matrices expandidas */
   .matrix-table.wide { table-layout: fixed; }
-  .matrix-table.wide th.row-head-wide { width: 240px; }
+  .matrix-table.wide th.row-head-wide { width: 310px; }
   /* Cabeceras fijas al hacer scroll, hasta el final de cada tabla. El shadow rellena los huecos del border-spacing para que no asome el contenido */
   .matrix-table thead th {
     position: sticky; top: 0; z-index: 5; background: var(--surface-1);
@@ -287,6 +287,7 @@
   .multiselect.wide .multiselect-panel { min-width: 260px; }
   .ms-option.sub { padding-left: 30px; }
   .ms-option.sub .ms-text { font-size: 12.5px; }
+  .ms-option.sub2 { padding-left: 48px; }
   .ms-option.parent .ms-text .ms-code { color: var(--brand); }
   .multiselect.open .multiselect-panel { display: block; }
   .ms-option {
@@ -449,18 +450,18 @@
         <span><span class="swatch"></span> celda vacía = ese paso no existe en esa fila</span>
         <span><span class="chip" style="margin:0;">Principal</span> = sublínea más importante de su línea</span>
       </div>
-      <p class="hint-hover">💡 Líneas principales: Cruceros, Grandes Viajes, Paquetes, Transporte y Hoteles. Dentro de Paquetes la principal es Vuelo + Hotel (<code class="code-ex">PAQ_V+H</code>) y dentro de Transporte, Vuelos (<code class="code-ex">TRP_VUE</code>). Fuente: CSV de consolidación de funnels (versión 3), con el mismo orden de líneas; Ferries (<code class="code-ex">TRP_FER</code>) es sublínea de Transporte.</p>
+      <p class="hint-hover">💡 Líneas con funnel de producto: Cruceros, Grandes Viajes, Paquetes, Transporte, Disney, Escapadas, Actividades y Hoteles. Home, Chollos y Transversales van en el bloque siguiente. Dentro de Paquetes la principal es Vuelo + Hotel (<code class="code-ex">PAQ_V+H</code>) y dentro de Transporte, Vuelos (<code class="code-ex">TRP_VUE</code>). <code class="code-ex">PAQ_CyE</code> y <code class="code-ex">PAQ_SES</code> son «Paquetes terceros» y se muestran con la etiqueta «Terceros». En el constructor de segmentación cuelgan de la agrupación <code class="code-ex">PAQ_TER</code>. Fuente: CSV de consolidación de funnels (versión 3), con el mismo orden de líneas; Ferries (<code class="code-ex">TRP_FER</code>) es sublínea de Transporte.</p>
     </div>
 
     <div class="card sub-card">
-      <div class="card-kicker">Otras líneas</div>
-      <h3>Líneas con funnel propio, de menor volumen</h3>
-      <p class="card-lead">Home, Chollos, Disney, Escapadas, Actividades y Transversales (<code>TRV</code>, sin sublíneas y con los 9 pasos). <b>Regla de códigos:</b> un código solo puede repetirse entre campos si designa lo mismo (<code>CHO</code> y <code>HOM</code> son línea y página a la vez). Si designa cosas distintas se renombra: la línea Escapadas es <code>EPA</code> (<code>ESC</code> queda para el paso Escaparate), la línea Transportes es <code>TRP</code> (<code>TRA</code> queda para el paso Selección de transporte) y los transfers son <code>TRP_TRF</code>.</p>
+      <div class="card-kicker">Entradas y transversales</div>
+      <h3>Home, Chollos y Transversales: páginas de entrada y vistas compartidas entre líneas</h3>
+      <p class="card-lead">Home (<code>HOM</code>) y Chollos (<code>CHO</code>) son los puntos de entrada de mayor volumen y tráfico, previos al funnel de producto. Transversales (<code>TRV</code>, sin sublíneas ni URL, con los 9 pasos) recoge lo que cruza todas las líneas. Disney, Escapadas y Actividades son líneas de producto y van en el bloque anterior. <b>Regla de códigos:</b> un código solo puede repetirse entre campos si designa lo mismo (<code>CHO</code> y <code>HOM</code> son línea y página a la vez). Si designa cosas distintas se renombra: la línea Escapadas es <code>EPA</code> (<code>ESC</code> queda para el paso Escaparate), la línea Transportes es <code>TRP</code> (<code>TRA</code> queda para el paso Selección de transporte) y los transfers son <code>TRP_TRF</code>.</p>
       <table class="matrix-table wide" id="matrix-table-oth">
         <thead id="thead-oth"></thead>
         <tbody id="matrix-body-oth"></tbody>
       </table>
-      <p class="hint-hover">💡 HOM y CHO solo tienen ESC: son puntos de entrada, sin CHK ni WAI.</p>
+      <p class="hint-hover">💡 HOM y CHO solo tienen ESC: son puntos de entrada, sin CHK ni WAI. TRV trackea los 9 pasos.</p>
     </div>
 
     <div class="card sub-card">
@@ -743,48 +744,49 @@
 
   function st(str) { return str.split(' '); }
   var CATALOG = [
-    { line: 'CRU', name: 'Cruceros', main: true, subs: [
+    { line: 'CRU', name: 'Cruceros', subs: [
       { code: 'CRU', name: 'Cruceros', url: 'logitravel.com/cruceros/', steps: st('ESC PLP PDP CFG PRE CHK WAI') }
     ]},
-    { line: 'GRV', name: 'Grandes Viajes', main: true, subs: [
+    { line: 'GRV', name: 'Grandes Viajes', subs: [
       { code: 'COM', name: 'Combinados', url: 'logitravel.com/grandes-viajes/combinados/', steps: st('ESC PLP PDP CFG PRE CHK WAI') },
       { code: 'CIR', name: 'Circuitos', url: 'logitravel.com/grandes-viajes/circuitos/', steps: st('ESC PLP PDP CFG PRE CHK WAI') },
       { code: 'RUT', name: 'Rutas en coche', url: 'logitravel.com/grandes-viajes/rutas-en-coche/', steps: st('ESC PLP PDP CFG PRE CHK WAI') }
     ]},
-    { line: 'PAQ', name: 'Paquetes', main: true, subs: [
+    { line: 'PAQ', name: 'Paquetes', groups: { TER: 'Paquetes terceros' }, subs: [
       { code: 'V+H', name: 'Vuelo + Hotel', star: true, url: 'logitravel.com/vuelo-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
       { code: 'F+H', name: 'Ferry + Hotel', url: 'logitravel.com/ferry-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
       { code: 'T+H', name: 'Tren + Hotel', url: 'logitravel.com/tren-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
-      { code: 'CyE', name: 'Caribe y Exóticos', url: '', steps: st('PLP PDP CFG CHK WAI') },
-      { code: 'SES', name: 'Salidas Especiales', url: '', steps: st('PLP PDP CFG CHK WAI') }
+      { code: 'CyE', name: 'Caribe y Exóticos', group: 'TER', url: '', steps: st('PLP PDP CFG CHK WAI') },
+      { code: 'SES', name: 'Salidas Especiales', group: 'TER', url: '', steps: st('PLP PDP CFG CHK WAI') }
     ]},
-    { line: 'TRP', name: 'Transportes', main: true, subs: [
+    { line: 'TRP', name: 'Transportes', subs: [
       { code: 'VUE', name: 'Vuelos', star: true, url: 'logitravel.com/vuelos/', steps: st('ESC PLP CHK WAI') },
       { code: 'TRE', name: 'Trenes', url: 'logitravel.com/trenes/', steps: st('ESC PLP CHK WAI') },
       { code: 'TRF', name: 'Transfers', url: 'logitravel.com/transfers/', steps: st('ESC PLP CHK WAI') },
       { code: 'COC', name: 'Alquiler coches', url: 'logitravel.com/alquiler-coches/', steps: st('ESC PLP CHK WAI') },
       { code: 'FER', name: 'Ferries', url: 'logitravel.com/ferries/', steps: st('ESC PLP CHK WAI') }
     ]},
-    { line: 'HOM', name: 'Home', main: false, tone: '#5f6b7a', subs: [
+    // cross: true = Home, Chollos y Transversales; se muestran en su propio bloque (no son una línea de producto)
+    { line: 'HOM', name: 'Home', cross: true, tone: '#5f6b7a', subs: [
       { code: 'HOM', name: 'Home', url: 'logitravel.com', steps: st('ESC') }
     ]},
-    { line: 'CHO', name: 'Chollos', main: false, tone: '#c0392b', subs: [
+    { line: 'CHO', name: 'Chollos', cross: true, tone: '#c0392b', subs: [
       { code: 'CHO', name: 'Chollos', url: 'logitravel.com/viajes-chollos/', steps: st('ESC') }
     ]},
-    { line: 'DIS', name: 'Disney', main: false, tone: '#1e3a8a', subs: [
+    { line: 'HOT', name: 'Hoteles', subs: [
+      { code: 'HOT', name: 'Hoteles', url: 'logitravel.com/hoteles/', steps: st('ESC PLP PDP CHK WAI') }
+    ]},
+    { line: 'DIS', name: 'Disney', tone: '#1e3a8a', subs: [
       { code: 'DIS', name: 'Disney', url: 'logitravel.com/disney/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') }
     ]},
-    { line: 'EPA', name: 'Escapadas', main: false, tone: '#4d8f1f', subs: [
+    { line: 'EPA', name: 'Escapadas', tone: '#4d8f1f', subs: [
       { code: 'EPA', name: 'Escapadas', url: 'logitravel.com/escapadas/', steps: st('ESC PLP PDP XTR PRE CHK WAI') }
     ]},
-    { line: 'ACT', name: 'Actividades', main: false, tone: '#0e8aa3', subs: [
+    { line: 'ACT', name: 'Actividades', tone: '#0e8aa3', subs: [
       { code: 'ACT', name: 'Actividades', url: 'logitravel.com/actividades', steps: st('ESC PLP PDP CHK WAI') }
     ]},
-    { line: 'TRV', name: 'Transversales', main: false, tone: '#6d28d9', subs: [
+    { line: 'TRV', name: 'Transversales', cross: true, tone: '#6d28d9', subs: [
       { code: 'TRV', name: 'Transversales', url: '', steps: st('ESC PLP PDP CFG TRA XTR PRE CHK WAI') }
-    ]},
-    { line: 'HOT', name: 'Hoteles', main: true, subs: [
-      { code: 'HOT', name: 'Hoteles', url: 'logitravel.com/hoteles/', steps: st('ESC PLP PDP CHK WAI') }
     ]}
   ];
 
@@ -834,6 +836,7 @@
     th.innerHTML =
       '<div class="row-head-inner"' + (o.title ? ' title="' + esc(o.title) + '"' : '') + '>' +
         '<span class="row-head-code" style="background:' + o.color + '; color:' + o.ink + ';">' + esc(o.chip) + '</span>' +
+        (o.chip2 ? '<span class="row-head-code" style="background:' + o.color2 + '; color:' + o.ink2 + ';">' + esc(o.chip2) + '</span>' : '') +
         '<span class="row-head-text">' +
           '<span class="row-head-line"><span class="row-head-name">' + esc(o.name) + '</span>' + (o.badge || '') + '</span>' +
           (o.sub ? '<span class="row-head-sub">' + esc(o.sub) + '</span>' : '') +
@@ -874,22 +877,21 @@
   var bodyOth = document.getElementById('matrix-body-oth');
   var firstMain = true, firstOth = true;
   CATALOG.forEach(function (g) {
-    var tbody = g.main ? bodyMain : bodyOth;
+    var tbody = g.cross ? bodyOth : bodyMain;
     var multi = g.subs.length > 1;
     g.subs.forEach(function (sub, i) {
       var key = subKey(g, sub);
       var isFirst = i === 0;
-      var gap = isFirst && (g.main ? !firstMain : !firstOth);
-      var lineColorKey = g.main ? g.line : 'OTH';
+      var gap = isFirst && (g.cross ? !firstOth : !firstMain);
       addRow(tbody, {
-        color: g.tone || LINE_COLOR[lineColorKey], ink: g.tone ? '#ffffff' : LINE_INK[lineColorKey],
-        chip: key, name: sub.name, sub: multi ? g.name : '',
+        color: g.tone || LINE_COLOR[g.line], ink: g.tone ? '#ffffff' : LINE_INK[g.line],
+        chip: key, name: sub.name, sub: multi ? g.name + (sub.group ? ' · Terceros' : '') : '',
         badge: sub.star ? '<span class="chip">Principal</span>' : '',
         title: sub.url ? 'https://www.' + sub.url : '',
         steps: toSet(sub.steps), gap: gap,
         optPlp: isOptPlp(key)
       });
-      if (isFirst) { if (g.main) firstMain = false; else firstOth = false; }
+      if (isFirst) { if (g.cross) firstOth = false; else firstMain = false; }
     });
   });
 
@@ -899,7 +901,8 @@
     p.lines.forEach(function (k, i) {
       addRow(bodyPar, {
         color: p.tone, ink: '#ffffff', tone: p.tone,
-        chip: p.code + '-', name: p.name, sub: k + ' · ' + NAME_BY_KEY[k],
+        chip: p.code + '-', name: p.name, sub: NAME_BY_KEY[k],
+        chip2: k, color2: LINE_COLOR[k.split('_')[0]], ink2: LINE_INK[k.split('_')[0]],
         title: p.url ? 'https://' + p.url : '',
         badge: i === 0 && p.lines.length > 1 ? '<span class="chip">' + p.lines.length + ' líneas</span>' : '',
         steps: toSet(STEPS_BY_KEY[k]), inherited: true, gap: i === 0 && pi > 0,
@@ -929,11 +932,20 @@
   }
 
   // Líneas y sublíneas disponibles en el constructor de segmentación (sección 05)
+  // Las sublíneas con `group` (PAQ_CyE y PAQ_SES → «Paquetes terceros») cuelgan de una agrupación PAQ_TER que solo existe aquí
   var LINEA_GROUPS = CATALOG.map(function (g) {
-    return {
-      line: g.line, name: g.name,
-      subs: g.subs.length > 1 ? g.subs.map(function (sub) { return { key: subKey(g, sub), code: sub.code, name: sub.name }; }) : []
-    };
+    var subs = [];
+    if (g.subs.length > 1) {
+      var emitted = {};
+      g.subs.forEach(function (sub) {
+        if (sub.group && !emitted[sub.group]) {
+          emitted[sub.group] = true;
+          subs.push({ key: g.line + '_' + sub.group, code: sub.group, name: g.groups[sub.group], group: true });
+        }
+        subs.push({ key: subKey(g, sub), code: sub.code, name: sub.name, parent: sub.group ? g.line + '_' + sub.group : null });
+      });
+    }
+    return { line: g.line, name: g.name, subs: subs };
   });
 
   // opción: [valor, nombre, línea padre (solo sublíneas), código visible, es línea con sublíneas]
@@ -941,7 +953,7 @@
   LINEA_GROUPS.forEach(function (g) {
     if (g.subs.length) {
       LINEA_OPTIONS.push([g.line, g.name + ' (línea completa)', null, g.line, true]);
-      g.subs.forEach(function (sub) { LINEA_OPTIONS.push([sub.key, sub.name, g.line, sub.code]); });
+      g.subs.forEach(function (sub) { LINEA_OPTIONS.push([sub.key, sub.name, sub.parent || g.line, sub.code, !!sub.group, !!sub.parent]); });
     } else {
       LINEA_OPTIONS.push([g.line, g.name, null, g.line, false]);
     }
@@ -1051,10 +1063,12 @@
     var panel = document.createElement('div');
     panel.className = 'multiselect-panel';
 
+    var byCode = {};
+    field.options.forEach(function (o) { byCode[o[0]] = o; });
     field.options.forEach(function (opt) {
       var code = opt[0], name = opt[1], parentLine = opt[2], shown = opt[3] || opt[0];
       var row = document.createElement('label');
-      row.className = 'ms-option' + (parentLine ? ' sub' : '') + (opt[4] ? ' parent' : '');
+      row.className = 'ms-option' + (parentLine ? ' sub' : '') + (opt[5] ? ' sub2' : '') + (opt[4] ? ' parent' : '');
       var cb = document.createElement('input');
       cb.type = 'checkbox';
       cb.checked = field.selected.indexOf(code) !== -1;
@@ -1066,13 +1080,12 @@
           } else {
             field.selected = field.selected.filter(function (c) { return c !== 'ALL'; });
             // línea completa y sublínea a la vez serían redundantes: elegir una quita la otra
-            if (parentLine) {
-              field.selected = field.selected.filter(function (c) { return c !== parentLine; });
-            } else {
-              field.options.forEach(function (o) {
-                if (o[2] === code) field.selected = field.selected.filter(function (c) { return c !== o[0]; });
-              });
-            }
+            var drop = {};
+            for (var p = parentLine; p; p = (byCode[p] || [])[2]) drop[p] = true;
+            (function walk(c) {
+              field.options.forEach(function (o) { if (o[2] === c) { drop[o[0]] = true; walk(o[0]); } });
+            })(code);
+            field.selected = field.selected.filter(function (c) { return !drop[c]; });
             if (field.selected.indexOf(code) === -1) field.selected.push(code);
           }
         } else {
