@@ -264,6 +264,17 @@
   .dict-legend .swatch.entry { background: var(--text-muted); }
   .dict-legend .swatch.step { background: var(--brand); }
 
+  /* ---- Segmentation reference tables (section 05) ---- */
+  .ref-wrap { overflow-x: auto; }
+  .ref-table { min-width: 620px; }
+  .ref-table code { font-family: ui-monospace, monospace; font-size: 12.5px; background: var(--page-plane); border: 1px solid var(--gridline); border-radius: 4px; padding: 1px 5px; white-space: nowrap; }
+  .ref-table td { padding: 8px 14px; font-size: 13px; }
+  .ref-table .code-badge { margin: 2px 4px 2px 0; }
+  .ex-table td.ok, .ex-table td.no { font-weight: 700; font-size: 15px; width: 36px; text-align: center; }
+  .ex-table td.ok { color: var(--good); }
+  .ex-table td.no { color: #c0392b; }
+  .ref-note { margin: 12px 0 0; font-size: 12.5px; color: var(--text-secondary); }
+
   /* ---- Segmentation builder ---- */
   .builder { padding: 26px 28px; }
   .builder-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
@@ -450,7 +461,7 @@
         <span><span class="swatch"></span> celda vacía = ese paso no existe en esa fila</span>
         <span><span class="chip" style="margin:0;">Principal</span> = sublínea más importante de su línea</span>
       </div>
-      <p class="hint-hover">💡 Líneas con funnel de producto: Cruceros, Grandes Viajes, Paquetes, Transporte, Disney, Escapadas, Actividades y Hoteles. Home, Chollos y Transversales van en el bloque siguiente. Dentro de Paquetes la principal es Vuelo + Hotel (<code class="code-ex">PAQ_V+H</code>) y dentro de Transporte, Vuelos (<code class="code-ex">TRP_VUE</code>). <code class="code-ex">PAQ_CyE</code> y <code class="code-ex">PAQ_SES</code> son «Paquetes terceros» y se muestran con la etiqueta «Terceros». En el constructor de segmentación cuelgan de la agrupación <code class="code-ex">PAQ_TER</code>. Fuente: CSV de consolidación de funnels (versión 3), con el mismo orden de líneas; Ferries (<code class="code-ex">TRP_FER</code>) es sublínea de Transporte.</p>
+      <p class="hint-hover">💡 Líneas con funnel de producto: Cruceros, Grandes Viajes, Paquetes, Transporte, Disney, Escapadas, Actividades y Hoteles. Home, Chollos y Transversales van en el bloque siguiente. Dentro de Paquetes la principal es Vuelo + Hotel (<code class="code-ex">PAQ_V+H</code>) y dentro de Transporte, Vuelos (<code class="code-ex">TRP_VUE</code>). <code class="code-ex">PAQ_CyE</code> y <code class="code-ex">PAQ_SES</code> son «Paquetes terceros» y se muestran con la etiqueta «Terceros». En el constructor de segmentación cuelgan de la agrupación <code class="code-ex">PAQ_TER</code>; V+H, F+H y T+H cuelgan de <code class="code-ex">PAQ_OWN</code> (propios), y <code class="code-ex">PAQ_ALL</code> los incluye a todos. Fuente: CSV de consolidación de funnels (versión 3), con el mismo orden de líneas; Ferries (<code class="code-ex">TRP_FER</code>) es sublínea de Transporte.</p>
     </div>
 
     <div class="card sub-card">
@@ -595,7 +606,7 @@
     <div class="section-head">
       <div class="kicker">05 · Código de segmentación (tests A/B · estudios UX)</div>
       <h2>SEGMENTO | DISPOSITIVO | LINEA[_SUBLINEA] | PAGINA | PAIS</h2>
-      <p>Multiselección por posición, igual que en el uso real: cada campo admite varios valores separados por coma (ej. <code style="font-family: ui-monospace, monospace;">NEW|DES,TAB|CRU,PAQ_V+H,F+H|PLP|PT,ES,FR</code>). Selecciona uno o varios valores en cada desplegable para ver el resultado exacto.</p>
+      <p>Multiselección por posición, igual que en el uso real: cada campo admite varios valores separados por coma (ej. <code style="font-family: ui-monospace, monospace;">NEW|DES,TAB|CRU,PAQ_V+H,F+H|PLP|PT,ES,FR</code>). Selecciona uno o varios valores en cada desplegable para ver el resultado exacto. Debajo del constructor están las reglas del campo LINEA, la lista completa de valores posibles y las decisiones que hay detrás.</p>
     </div>
     <div class="card builder">
       <div class="builder-grid" id="builder-grid"></div>
@@ -604,14 +615,79 @@
         <button class="copy-btn" id="copy-code">Copiar</button>
       </div>
       <div class="card seg-why">
-        <h4>¿Cómo se escribe la línea cuando hay sublínea?</h4>
+        <h4>¿Cómo se escribe el campo LINEA?</h4>
         <ul>
-          <li><b>Sin sublínea:</b> solo el código de línea, p. ej. <code>PAQ</code> (línea completa). Las líneas con una única sublínea (CRU, HOT, ACT…) se escriben siempre así.</li>
-          <li><b>Con sublínea:</b> <code>LINEA_SUBLINEA</code> dentro del mismo campo, p. ej. <code>PAQ_V+H</code>.</li>
-          <li><b>Varias sublíneas de una línea:</b> se separan con coma y el prefijo se escribe una sola vez, p. ej. <code>PAQ_V+H,F+H</code>. Con varias líneas: <code>CRU,PAQ_V+H,F+H,TRP_VUE</code>.</li>
-          <li><b>Línea completa y sublínea a la vez</b> sería redundante: el selector lo evita.</li>
+          <li><b>Líneas con una sola sublínea o ninguna</b> (CRU, HOT, DIS, EPA, ACT, HOM, CHO, TRV): solo el código de línea. No admiten <code>_ALL</code>.</li>
+          <li><b>Líneas con varias sublíneas</b> (GRV, PAQ, TRP): nunca van solas. Llevan siempre un sufijo: una sublínea (<code>TRP_VUE</code>), un grupo (<code>PAQ_OWN</code>) o todas (<code>GRV_ALL</code>). <code>GRV</code>, <code>PAQ</code> o <code>TRP</code> sueltos son códigos inválidos.</li>
+          <li><b>Varias sublíneas de una misma línea:</b> se separan con coma y el prefijo se escribe una sola vez, p. ej. <code>PAQ_V+H,F+H</code>. Grupos y sublíneas se pueden mezclar: <code>PAQ_OWN,CyE</code>. Con varias líneas: <code>CRU,PAQ_V+H,F+H,TRP_VUE</code>.</li>
+          <li><b>Sin redundancia:</b> no se combina un código con otro que ya lo incluye (<code>PAQ_ALL,PAQ_V+H</code> o <code>PAQ_OWN,V+H</code>); el selector lo evita. Si hacen falta los dos grupos de Paquetes, se escribe <code>PAQ_ALL</code>.</li>
           <li><b>Partners:</b> no van en este campo. Se identifican por el prefijo del ID de la hipótesis (<code>MEL-0254</code>) y su línea se escribe con la nomenclatura de funnel (<code>PAQ_V+H</code>); ver sección 03.</li>
         </ul>
+      </div>
+      <div class="card seg-why">
+        <h4>Todos los valores posibles del campo LINEA</h4>
+        <div class="ref-wrap">
+          <table class="dict-table ref-table">
+            <thead><tr><th>Código</th><th>Tipo</th><th>Qué cubre</th><th>Equivale a</th></tr></thead>
+            <tbody id="linea-ref-body"></tbody>
+          </table>
+        </div>
+        <p class="ref-note"><b>Tipos.</b> <i>Sublínea</i>: un producto concreto. <i>Grupo</i>: atajo de varias sublíneas de Paquetes; no es un funnel ni una fila de la sección 03. <i>Todas</i>: todas las sublíneas de la línea. Esta tabla se genera del mismo catálogo que el selector de arriba, así que siempre coincide con él.</p>
+      </div>
+      <div class="card seg-why">
+        <h4>Decisiones tomadas y por qué</h4>
+        <ul>
+          <li><b>Claridad antes que brevedad.</b> La sublínea siempre se escribe con su línea (<code>TRP_VUE</code>, nunca <code>VUE</code>) y no se inventan alias (<code>pack</code>, <code>GRB</code>, <code>B+H</code>). El prefijo dice a qué línea pertenece, permite filtrar todo Transportes buscando <code>TRP_</code> y evita que un código de sublínea choque algún día con el de una línea u otra sublínea. Escribir <code>VUE</code> ahorraría 4 caracteres y obligaría a consultar una tabla para saber de qué línea es.</li>
+          <li><b>GRV, PAQ y TRP nunca van solas.</b> Con la línea sola no se distingue «afecta a toda la línea» de «se me olvidó la sublínea», y el significado cambiaría si se añade una sublínea nueva. Además, en los datos antiguos <code>PAQ</code> significaba Vuelo + Hotel: un <code>PAQ</code> suelto en un registro es, casi seguro, anterior a esta nomenclatura y no se reinterpreta.</li>
+          <li><b><code>_ALL</code> significa «todas las sublíneas de la línea».</b> Solo existe en las líneas con varias sublíneas (<code>GRV_ALL</code>, <code>PAQ_ALL</code>, <code>TRP_ALL</code>). Es la misma idea que <code>ALL</code> en segmento, dispositivo y país («sin filtrar»), y es más claro que dejar la línea sola. Cuesta 4 caracteres y se escribe siempre, también en Grandes Viajes aunque casi siempre se testee entero, para que no haya una excepción que recordar.</li>
+          <li><b>Paquetes se divide en dos grupos: <code>PAQ_OWN</code> (propios: V+H, F+H, T+H) y <code>PAQ_TER</code> (terceros: CyE, SES).</b> <code>PAQ_ALL</code> es la suma de los dos. Los grupos son atajos de las listas que el campo ya admite (<code>PAQ_OWN</code> = <code>PAQ_V+H,F+H,T+H</code>), así que no hace falta ningún mecanismo nuevo.</li>
+          <li><b>Todos los códigos de sublínea y de grupo tienen tres letras</b> (<code>OWN</code>, <code>TER</code>, <code>ALL</code>, <code>VUE</code>, <code>COM</code>…), igual que los de línea y página. Se descartó <code>PRO</code> porque en el negocio significa producción, y <code>PROP</code> por no seguir esa regla de tres letras.</li>
+          <li><b>En un tracker se usa la sublínea concreta.</b> Un tracker mide un evento real, y un clic en el resumen de precios de vuelos no es comparable con uno de trenes. <code>_ALL</code> o un grupo solo valen si el elemento es idéntico en todas las sublíneas (por ejemplo, un banner global de la línea). El código de segmentación de un test, en cambio, sí usa <code>_ALL</code> o un grupo cuando la variante afecta a todo el alcance. Ver sección 06.</li>
+          <li><b>Los registros antiguos no se reinterpretan.</b> Los tests y trackers ya creados mantienen su nombre; la nomenclatura nueva se aplica a lo que se cree a partir de ahora (equivalencias más abajo).</li>
+        </ul>
+      </div>
+      <div class="card seg-why">
+        <h4>Ejemplos válidos e inválidos</h4>
+        <div class="ref-wrap">
+          <table class="dict-table ref-table ex-table">
+            <thead><tr><th></th><th>Código</th><th>Por qué</th></tr></thead>
+            <tbody>
+              <tr><td class="ok">✔</td><td><code>ALL|DES|TRP_VUE|PLP|ALL</code></td><td>Un test solo de vuelos, en el listado y en desktop.</td></tr>
+              <tr><td class="ok">✔</td><td><code>ALL|ALL|TRP_ALL|PLP|ALL</code></td><td>Afecta a todo Transportes (las cinco sublíneas).</td></tr>
+              <tr><td class="ok">✔</td><td><code>ALL|ALL|PAQ_OWN|PDP|ALL</code></td><td>Paquetes propios: V+H, F+H y T+H, sin terceros.</td></tr>
+              <tr><td class="ok">✔</td><td><code>ALL|ALL|PAQ_ALL|CHK|ALL</code></td><td>Todos los paquetes, propios y terceros.</td></tr>
+              <tr><td class="ok">✔</td><td><code>ALL|ALL|GRV_ALL|PDP|ALL</code></td><td>Todo Grandes Viajes (Combinados, Circuitos y Rutas en coche).</td></tr>
+              <tr><td class="ok">✔</td><td><code>ALL|ALL|GRV_COM|PDP|ALL</code></td><td>Solo la sublínea Combinados.</td></tr>
+              <tr><td class="ok">✔</td><td><code>ALL|ALL|PAQ_V+H,F+H|PLP|ALL</code></td><td>Dos sublíneas de una misma línea: el prefijo se escribe una vez.</td></tr>
+              <tr><td class="ok">✔</td><td><code>ALL|ALL|CRU,PAQ_OWN,CyE|PLP|ALL</code></td><td>Varias líneas, con un grupo y una sublínea mezclados.</td></tr>
+              <tr><td class="ok">✔</td><td><code>ALL|ALL|HOT|PLP|ALL</code></td><td>Hoteles tiene una sola sublínea: se escribe solo la línea.</td></tr>
+              <tr><td class="no">✘</td><td><code>ALL|ALL|PAQ|PDP|ALL</code></td><td>Paquetes nunca va sola. Hay que elegir <code>PAQ_OWN</code>, <code>PAQ_TER</code>, <code>PAQ_ALL</code> o una sublínea.</td></tr>
+              <tr><td class="no">✘</td><td><code>ALL|ALL|TRP|PLP|ALL</code></td><td>Transportes nunca va sola: <code>TRP_ALL</code> o una sublínea.</td></tr>
+              <tr><td class="no">✘</td><td><code>ALL|ALL|VUE|PLP|ALL</code></td><td>La sublínea siempre lleva su línea: <code>TRP_VUE</code>.</td></tr>
+              <tr><td class="no">✘</td><td><code>ALL|ALL|CRU_ALL|PLP|ALL</code></td><td>Cruceros tiene una sola sublínea: <code>_ALL</code> no existe.</td></tr>
+              <tr><td class="no">✘</td><td><code>ALL|ALL|PAQ_ALL,PAQ_V+H|PLP|ALL</code></td><td>Redundante: <code>PAQ_ALL</code> ya incluye V+H.</td></tr>
+              <tr><td class="no">✘</td><td><code>ALL|ALL|PAQ_PRO|PLP|ALL</code></td><td><code>PRO</code> significa producción. El grupo de propios es <code>PAQ_OWN</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card seg-why">
+        <h4>Equivalencia con los códigos antiguos</h4>
+        <div class="ref-wrap">
+          <table class="dict-table ref-table">
+            <thead><tr><th>Antiguo (CRO Hub, CSV, AB Tasty)</th><th>Código nuevo</th></tr></thead>
+            <tbody>
+              <tr><td><code>GV</code></td><td><code>GRV_ALL</code></td></tr>
+              <tr><td><code>GV - Combinados</code></td><td><code>GRV_COM</code></td></tr>
+              <tr><td><code>PAQ</code>, <code>PAQ - V+H</code>, <code>V+H</code></td><td><code>PAQ_V+H</code> (el <code>PAQ</code> antiguo valía V+H)</td></tr>
+              <tr><td><code>F+H</code>, <code>T+H</code></td><td><code>PAQ_F+H</code>, <code>PAQ_T+H</code></td></tr>
+              <tr><td><code>TTOO</code> (terceros)</td><td><code>PAQ_TER</code>, o <code>PAQ_CyE</code> / <code>PAQ_SES</code> si se conoce la sublínea</td></tr>
+              <tr><td><code>TRANS</code>, <code>TRX</code></td><td><code>TRP_ALL</code>, o la sublínea si se conoce</td></tr>
+              <tr><td><code>TRANS - VUE</code>, <code>TRX - Vuelos</code></td><td><code>TRP_VUE</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="ref-note">Los nombres ya registrados en AB Tasty no se renombran solos: deben coincidir con la cuenta hasta que se decida migrarlos.</p>
       </div>
       <div class="card seg-why">
         <h4>¿Por qué añadir un 5º elemento (PAGINA) al código?</h4>
@@ -635,14 +711,15 @@
     <div class="tracker-grid">
       <div class="card tracker-card">
         <h4>Patrón</h4>
-        <div class="tracker-pattern">LINEA_NEGOCIO[_SUBLINEA] | DISPOSITIVO | ACCION - Nombre</div>
-        <p class="tracker-example">Ejemplos: <code>PAQ_V+H|ALL|CLIC - Copiar promocode</code> · <code>CRU|MOB|HOVER - Saldo monedero</code></p>
+        <div class="tracker-pattern">LINEA[_SUBLINEA] | DISPOSITIVO | ACCION - Nombre</div>
+        <p class="tracker-example">Ejemplos: <code>PAQ_V+H|ALL|CLIC - Copiar promocode</code> · <code>CRU|MOB|HOVER - Saldo monedero</code> · <code>TRP_VUE|DES|CLIC - Interacción resumen de precios</code></p>
       </div>
       <div class="card tracker-card">
         <h4>Reglas clave</h4>
         <p class="tracker-example">
           · El nombre va siempre <b>hardcodeado</b> como string literal fijo, nunca concatenado con datos que cambien (precio, código promo).<br>
           · <b>ACCION</b> no se limita a <code>CLIC</code>: también <code>VIEW</code>, <code>HOVER</code>, etc.<br>
+          · <b>Sublínea concreta:</b> en GRV, PAQ y TRP el tracker lleva la sublínea (<code>TRP_VUE</code>, <code>GRV_COM</code>), porque mide un evento real. <code>_ALL</code> o un grupo (<code>PAQ_OWN</code>) solo si el elemento es idéntico en todas las sublíneas. La línea sola es inválida (ver sección 05).<br>
           · Sin dedupe por defecto — AB Tasty ya separa visitantes de sesiones en su reporting.<br>
           · <b>Sin partner:</b> el tracker no identifica al partner (ni como prefijo ni en el nombre), porque la campaña ya lo aporta. El partner se identifica solo en el prefijo del ID de la hipótesis (<code>MEL-0254</code>); la línea del tracker usa la nomenclatura de funnel de siempre (<code>PAQ_V+H</code>).
         </p>
@@ -752,10 +829,10 @@
       { code: 'CIR', name: 'Circuitos', url: 'logitravel.com/grandes-viajes/circuitos/', steps: st('ESC PLP PDP CFG PRE CHK WAI') },
       { code: 'RUT', name: 'Rutas en coche', url: 'logitravel.com/grandes-viajes/rutas-en-coche/', steps: st('ESC PLP PDP CFG PRE CHK WAI') }
     ]},
-    { line: 'PAQ', name: 'Paquetes', groups: { TER: 'Paquetes terceros' }, subs: [
-      { code: 'V+H', name: 'Vuelo + Hotel', star: true, url: 'logitravel.com/vuelo-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
-      { code: 'F+H', name: 'Ferry + Hotel', url: 'logitravel.com/ferry-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
-      { code: 'T+H', name: 'Tren + Hotel', url: 'logitravel.com/tren-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
+    { line: 'PAQ', name: 'Paquetes', groups: { OWN: 'Paquetes propios', TER: 'Paquetes terceros' }, subs: [
+      { code: 'V+H', name: 'Vuelo + Hotel', star: true, group: 'OWN', url: 'logitravel.com/vuelo-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
+      { code: 'F+H', name: 'Ferry + Hotel', group: 'OWN', url: 'logitravel.com/ferry-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
+      { code: 'T+H', name: 'Tren + Hotel', group: 'OWN', url: 'logitravel.com/tren-hotel/', steps: st('ESC PLP PDP TRA XTR PRE CHK WAI') },
       { code: 'CyE', name: 'Caribe y Exóticos', group: 'TER', url: '', steps: st('PLP PDP CFG CHK WAI') },
       { code: 'SES', name: 'Salidas Especiales', group: 'TER', url: '', steps: st('PLP PDP CFG CHK WAI') }
     ]},
@@ -885,7 +962,7 @@
       var gap = isFirst && (g.cross ? !firstOth : !firstMain);
       addRow(tbody, {
         color: g.tone || LINE_COLOR[g.line], ink: g.tone ? '#ffffff' : LINE_INK[g.line],
-        chip: key, name: sub.name, sub: multi ? g.name + (sub.group ? ' · Terceros' : '') : '',
+        chip: key, name: sub.name, sub: multi ? g.name + (sub.group === 'TER' ? ' · Terceros' : '') : '',
         badge: sub.star ? '<span class="chip">Principal</span>' : '',
         title: sub.url ? 'https://www.' + sub.url : '',
         steps: toSet(sub.steps), gap: gap,
@@ -931,45 +1008,75 @@
     pill.textContent = CATALOG.length + ' líneas · ' + nSubs + ' sublíneas · ' + PARTNERS.length + ' partners · Liverpool aparte';
   }
 
-  // Líneas y sublíneas disponibles en el constructor de segmentación (sección 05)
-  // Las sublíneas con `group` (PAQ_CyE y PAQ_SES → «Paquetes terceros») cuelgan de una agrupación PAQ_TER que solo existe aquí
+  // Líneas, grupos y sublíneas disponibles en el constructor de segmentación (sección 05)
+  // Las líneas con varias sublíneas (GRV, PAQ, TRP) nunca van solas: ofrecen LINEA_ALL (todas), y las sublíneas con `group`
+  // (PAQ_OWN = propios, PAQ_TER = terceros) cuelgan de una agrupación que solo existe aquí, como atajo de lista.
   var LINEA_GROUPS = CATALOG.map(function (g) {
+    var multi = g.subs.length > 1;
+    var all = multi ? g.line + '_ALL' : g.line;
     var subs = [];
-    if (g.subs.length > 1) {
+    if (multi) {
       var emitted = {};
       g.subs.forEach(function (sub) {
+        var groupKey = sub.group ? g.line + '_' + sub.group : null;
         if (sub.group && !emitted[sub.group]) {
           emitted[sub.group] = true;
-          subs.push({ key: g.line + '_' + sub.group, code: sub.group, name: g.groups[sub.group], group: true });
+          subs.push({ key: groupKey, code: sub.group, name: g.groups[sub.group], group: true, parent: all });
         }
-        subs.push({ key: subKey(g, sub), code: sub.code, name: sub.name, parent: sub.group ? g.line + '_' + sub.group : null });
+        subs.push({ key: subKey(g, sub), code: sub.code, name: sub.name, parent: groupKey || all });
       });
     }
-    return { line: g.line, name: g.name, subs: subs };
+    return { line: g.line, name: g.name, all: all, subs: subs };
   });
 
-  // opción: [valor, nombre, línea padre (solo sublíneas), código visible, es línea con sublíneas]
+  // opción: [valor, nombre, padre (solo grupos y sublíneas), código visible, tiene hijos, cuelga de un grupo]
   var LINEA_OPTIONS = [['ALL', 'Todas']];
   LINEA_GROUPS.forEach(function (g) {
     if (g.subs.length) {
-      LINEA_OPTIONS.push([g.line, g.name + ' (línea completa)', null, g.line, true]);
-      g.subs.forEach(function (sub) { LINEA_OPTIONS.push([sub.key, sub.name, sub.parent || g.line, sub.code, !!sub.group, !!sub.parent]); });
+      LINEA_OPTIONS.push([g.all, g.name + ' (todas las sublíneas)', null, g.all, true]);
+      g.subs.forEach(function (sub) {
+        LINEA_OPTIONS.push([sub.key, sub.name, sub.parent, sub.key, !!sub.group, sub.parent !== g.all]);
+      });
     } else {
       LINEA_OPTIONS.push([g.line, g.name, null, g.line, false]);
     }
   });
 
-  // PAQ_V+H,F+H: el prefijo de línea se escribe una sola vez; la línea completa va sin sublínea
+  // PAQ_V+H,F+H: el prefijo de línea se escribe una sola vez; LINEA_ALL va con su propio código
   function formatLinea(sel) {
     if (sel.indexOf('ALL') !== -1) return 'ALL';
     var parts = [];
     LINEA_GROUPS.forEach(function (g) {
-      if (sel.indexOf(g.line) !== -1) { parts.push(g.line); return; }
+      if (sel.indexOf(g.all) !== -1) { parts.push(g.all); return; }
       var picked = g.subs.filter(function (sub) { return sel.indexOf(sub.key) !== -1; });
       picked.forEach(function (sub, i) { parts.push(i === 0 ? sub.key : sub.code); });
     });
     return parts.join(',');
   }
+
+  // Tabla de referencia de la sección 05: se genera del mismo catálogo que el constructor, para que nunca se desincronice
+  (function () {
+    var body = document.getElementById('linea-ref-body');
+    if (!body) return;
+    function badge(c) { return '<span class="code-badge">' + c + '</span>'; }
+    function row(codes, type, what, equiv) {
+      return '<tr><td>' + codes + '</td><td>' + type + '</td><td>' + what + '</td><td>' + (equiv ? '<code>' + equiv + '</code>' : '—') + '</td></tr>';
+    }
+    function codesOf(g, parent) {
+      return g.subs.filter(function (s) { return !s.group && (!parent || s.parent === parent); }).map(function (s) { return s.code; });
+    }
+    var singles = LINEA_GROUPS.filter(function (g) { return !g.subs.length; }).map(function (g) { return g.line; });
+    var html = row(singles.map(badge).join(' '), 'Línea', 'Líneas con una sola sublínea o ninguna: se escriben solo con la línea. No existe <code>CRU_ALL</code> ni <code>HOT_ALL</code>.', '');
+    LINEA_GROUPS.forEach(function (g) {
+      if (!g.subs.length) return;
+      html += row(badge(g.all), 'Todas', 'Todo ' + g.name + ' (' + codesOf(g).length + ' sublíneas)', g.line + '_' + codesOf(g).join(','));
+      g.subs.forEach(function (sub) {
+        if (sub.group) html += row(badge(sub.key), 'Grupo', sub.name, g.line + '_' + codesOf(g, sub.key).join(','));
+        else html += row(badge(sub.key), 'Sublínea', sub.name, '');
+      });
+    });
+    body.innerHTML = html;
+  })();
 
   // "Before" matrix — same layout, but showing the original/fragmented names
   var bodyRaw = document.getElementById('matrix-body-raw');
@@ -1087,6 +1194,20 @@
             })(code);
             field.selected = field.selected.filter(function (c) { return !drop[c]; });
             if (field.selected.indexOf(code) === -1) field.selected.push(code);
+            // si quedan marcados todos los hijos de un código, se sustituyen por él (PAQ_OWN + PAQ_TER → PAQ_ALL)
+            var collapsed = true;
+            while (collapsed) {
+              collapsed = false;
+              field.options.forEach(function (o) {
+                var kids = field.options.filter(function (k) { return k[2] === o[0]; });
+                if (!kids.length || field.selected.indexOf(o[0]) !== -1) return;
+                if (kids.every(function (k) { return field.selected.indexOf(k[0]) !== -1; })) {
+                  field.selected = field.selected.filter(function (c) { return !kids.some(function (k) { return k[0] === c; }); });
+                  field.selected.push(o[0]);
+                  collapsed = true;
+                }
+              });
+            }
           }
         } else {
           field.selected = field.selected.filter(function (c) { return c !== code; });
