@@ -144,11 +144,19 @@
     align-items: center; text-align: center;
   }
   .step-cell.empty .label { color: var(--text-muted); font-size: 11px; margin: 0; opacity: 1; }
+  /* Las píldoras van dentro de la celda (no sobresalen): la cabecera fija las cortaba en la primera fila.
+     Van arriba a la derecha, junto al código de 3 letras, para no pisar el nombre del paso. Si coinciden (PLP: Opc. + Dispo), se apilan. */
   .opt-flag {
-    position: absolute; top: -8px; right: -6px;
+    position: absolute; top: 3px; right: 3px;
     background: #fff; color: #a06600; border: 1px solid #f3e2ac;
-    font-size: 9.5px; font-weight: 700; text-transform: uppercase;
-    padding: 2px 6px; border-radius: 9999px; box-shadow: 0 1px 2px rgba(11,11,11,0.12);
+    font-size: 8.5px; font-weight: 700; text-transform: uppercase; line-height: 1.2;
+    padding: 1px 5px; border-radius: 9999px; box-shadow: 0 1px 2px rgba(11,11,11,0.12);
+  }
+  .dispo-flag {
+    position: absolute; top: 3px; right: 3px;
+    background: var(--brand-subtle); color: var(--brand); border: 1px solid #b9dcf3;
+    font-size: 8.5px; font-weight: 700; text-transform: uppercase; line-height: 1.2;
+    padding: 1px 5px; border-radius: 9999px; box-shadow: 0 1px 2px rgba(11,11,11,0.12);
   }
   /* ---- Matriz expandida: ESC + sublíneas + partners (misma cabecera que el pipeline/roadmap) ---- */
   .matrix-table th.row-head-wide { width: 240px; }
@@ -196,6 +204,19 @@
   .matrix-note span { display: inline-flex; align-items: center; gap: 6px; }
   .matrix-note .swatch { width: 10px; height: 10px; border-radius: 3px; border: 1.5px dashed var(--gridline); }
   .hint-hover { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+
+  .opt-flag + .dispo-flag, .dispo-flag + .opt-flag { top: 19px; }
+
+  /* Etiqueta de agrupación (GRV_ALL, PAQ_OWN, PAQ_TER, TRP_ALL) sobre las filas que agrupa.
+     Alineada a la izquierda con los chips de las sublíneas: mismo relleno que th (6px) + row-head-inner (8px), sin sangría. */
+  /* La línea va ENCIMA de la etiqueta: es la cabecera de las filas que tiene debajo, no el cierre de las de arriba. */
+  .matrix-table th.group-label { padding: 14px 0 0 6px; font-weight: 400; text-align: left; }
+  .group-label .gl-inner { display: flex; align-items: center; gap: 8px; padding: 10px 0 0 8px; border-top: 2px solid var(--gl-color, var(--gridline)); }
+  /* Separador sin etiqueta: línea fina que cierra un grupo antes de una línea sin agrupación (HOT, DIS…) */
+  .group-label .gl-inner.plain { padding: 0; border-top: 1.5px solid var(--gridline); }
+  .group-label .gl-code { font-family: ui-monospace, monospace; font-weight: 800; font-size: 13px; letter-spacing: 0.02em; padding: 4px 9px; border-radius: 6px; white-space: nowrap; }
+  .group-label .gl-text { font-size: 12.5px; color: var(--text-secondary); }
+  .group-label .gl-text b { color: var(--text-primary); font-weight: 600; }
 
   /* ---- Raw/original step cell (fragmentation "before" matrix) ---- */
   .step-cell-raw { min-height: 74px; align-items: flex-start; }
@@ -343,6 +364,54 @@
   .tracker-example code { font-family: ui-monospace, monospace; background: var(--brand-subtle); color: #003366; padding: 1px 6px; border-radius: 4px; }
   @media (max-width: 760px) { .tracker-grid { grid-template-columns: 1fr; } .builder-grid { grid-template-columns: repeat(2, 1fr); } }
 
+  /* ---- Secciones plegables ---- */
+  html { scroll-behavior: smooth; }
+  section { scroll-margin-top: 20px; }
+  section .section-head { position: relative; padding: 0 88px 14px 0; border-bottom: 1px solid var(--gridline); cursor: pointer; }
+  .sec-link {
+    position: absolute; top: 2px; right: 40px; width: 30px; height: 30px; border-radius: 50%; border: none; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: none; color: var(--text-muted); font-size: 14px; cursor: pointer; transition: background .12s, color .12s;
+  }
+  .sec-link:hover, .sec-link:focus-visible { background: var(--brand-subtle); color: var(--brand); }
+  .sec-link.copied { background: var(--good); color: #fff; font-size: 13px; }
+  section .section-head:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; border-radius: 6px; }
+  section .sec-body { padding-top: 18px; }
+  section.collapsed { margin-bottom: 18px; }
+  section.collapsed .sec-body { display: none; }
+  .sec-chevron {
+    position: absolute; top: 2px; right: 0; width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--brand-subtle); color: var(--brand); font-size: 12px; transition: transform 0.15s;
+  }
+  section.collapsed .sec-chevron { transform: rotate(-90deg); }
+  section .section-head:hover .sec-chevron { background: var(--brand); color: #fff; }
+  body.edit-mode section .section-head { cursor: default; }
+  .sec-tools { display: flex; justify-content: flex-end; margin: -12px 0 14px; }
+  .sec-tools button {
+    font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--brand);
+    background: none; border: 1.5px solid var(--brand); border-radius: 9999px; padding: 6px 14px; cursor: pointer;
+  }
+  .sec-tools button:hover { background: var(--brand-subtle); }
+
+  /* ---- Eventos de funnel (sección 07) ---- */
+  .event-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .event-card { padding: 16px 18px; }
+  .event-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .event-card-head .ev-name { flex: 1; font-size: 12.5px; color: var(--text-secondary); min-width: 0; }
+  .event-card-head .ev-count { font-size: 11px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+  .ev-copy {
+    font-family: inherit; font-size: 11.5px; font-weight: 600; color: var(--brand);
+    background: var(--brand-subtle); border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer;
+  }
+  .ev-copy:hover { background: var(--brand); color: #fff; }
+  .ev-list { margin: 0; padding: 0; list-style: none; font-family: ui-monospace, monospace; font-size: 12px; color: var(--text-primary); }
+  .ev-list li { padding: 4px 8px; border-radius: 4px; white-space: nowrap; overflow-x: auto; }
+  .ev-list li:nth-child(odd) { background: var(--page-plane); }
+  .ev-note { margin: 10px 0 0; font-size: 11.5px; color: #a06600; background: #fff7db; border: 1px solid #f3e2ac; border-radius: 6px; padding: 6px 9px; }
+  @media (max-width: 1000px) { .event-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .event-grid { grid-template-columns: 1fr; } }
+
   footer.next-steps {
     display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
     padding: 22px 28px; background: var(--brand-subtle); border-radius: var(--radius-lg);
@@ -367,7 +436,7 @@
   </header>
 
   <!-- WHY IT MATTERS -->
-  <section>
+  <section id="por-que">
     <div class="section-head">
       <div class="kicker">01 · Por qué estandarizar</div>
       <h2>5 razones para invertir en un vocabulario común</h2>
@@ -413,7 +482,7 @@
   </section>
 
   <!-- FRAGMENTATION "BEFORE" MATRIX -->
-  <section>
+  <section id="situacion-actual">
     <div class="section-head">
       <div class="kicker">02 · Situación actual: nombres sin estandarizar</div>
       <h2>Los funnels hoy</h2>
@@ -444,7 +513,7 @@
   </section>
 
   <!-- HORIZONTAL FUNNEL MATRIX -->
-  <section>
+  <section id="propuesta">
     <div class="section-head">
       <div class="kicker">03 · Propuesta: nombres estandarizados</div>
       <h2>Líneas, sublíneas, partners y otros negocios, con los mismos pasos</h2>
@@ -458,6 +527,7 @@
       </table>
       <div class="matrix-note">
         <span><span class="opt-flag" style="position:static;">Opc.</span> = paso opcional (hay entrada directa a PDP sin pasar por él)</span>
+        <span><span class="dispo-flag" style="position:static;">Dispo</span> = paso donde se chequea la disponibilidad (el que antes se llamaba «Disponibilidad»)</span>
         <span><span class="swatch"></span> celda vacía = ese paso no existe en esa fila</span>
         <span><span class="chip" style="margin:0;">Principal</span> = sublínea más importante de su línea</span>
       </div>
@@ -506,7 +576,7 @@
   </section>
 
   <!-- DICTIONARY -->
-  <section>
+  <section id="diccionario">
     <div class="section-head">
       <div class="kicker">04 · Diccionario de páginas</div>
       <h2>11 códigos de funnel de 3 letras cubren todas las líneas de negocio</h2>
@@ -602,7 +672,7 @@
   </section>
 
   <!-- SEGMENTATION BUILDER -->
-  <section>
+  <section id="segmentacion">
     <div class="section-head">
       <div class="kicker">05 · Código de segmentación (tests A/B · estudios UX)</div>
       <h2>SEGMENTO | DISPOSITIVO | LINEA[_SUBLINEA] | PAGINA | PAIS</h2>
@@ -702,7 +772,7 @@
   </section>
 
   <!-- TRACKER CONVENTION -->
-  <section>
+  <section id="trackers">
     <div class="section-head">
       <div class="kicker">06 · Convención de trackers (AB Tasty)</div>
       <h2>Reutiliza los mismos códigos de línea y dispositivo</h2>
@@ -725,6 +795,29 @@
         </p>
       </div>
     </div>
+  </section>
+
+  <!-- FUNNEL EVENTS -->
+  <section id="eventos">
+    <div class="section-head">
+      <div class="kicker">07 · Eventos de funnel (AB Tasty · Quantum)</div>
+      <h2>Un evento por paso del funnel, con el mismo nombre en las dos herramientas</h2>
+      <p>Cada paso de cada funnel tiene un evento propio. Se nombra igual en AB Tasty y en Quantum para poder cruzar el análisis de los tests con el del rendimiento de la web. La lista se genera del mismo catálogo que la matriz de la sección 03.</p>
+    </div>
+    <div class="card tracker-card" style="margin-bottom: 16px;">
+      <h4>Patrón</h4>
+      <div class="tracker-pattern">LINEA[_SUBLINEA] - Nº - PÁGINA - Nombre</div>
+      <p class="tracker-example">
+        Ejemplos: <code>HOT - 2 - PLP - Listado</code> · <code>PAQ_V+H - 4 - TRA - Transporte</code> · <code>CRU - 4 - CFG - Configuración</code><br>
+        · <b>Nº</b> es el orden del paso dentro de su funnel, empezando en 1 por el Escaparate o, si no lo tiene, por el primer paso.<br>
+        · <b>PÁGINA</b> y <b>Nombre</b> salen del diccionario de la sección 04.<br>
+        · El <b>dispositivo no va en el nombre</b>: se segmenta aparte en cada herramienta.<br>
+        · Sin <code>|</code>, para no confundirlos con los trackers de clic (sección 06) ni con el código de segmentación (sección 05).<br>
+        · No son pasos del funnel y quedan fuera: el guardado de presupuesto, el AOV y los pasos «GP».<br>
+        · <code>GRV_ALL</code> y <code>TRP_ALL</code> agrupan los pasos de todas sus sublíneas, que son idénticos. En Paquetes no hay <code>PAQ_ALL</code>: propios y terceros tienen funnels distintos, así que se miden con <code>PAQ_OWN</code> y <code>PAQ_TER</code>.
+      </p>
+    </div>
+    <div class="event-grid" id="events-grid"></div>
   </section>
 
   <footer class="next-steps card">
@@ -931,6 +1024,7 @@
             (o.tone
               ? ' style="background:color-mix(in srgb, ' + o.tone + ' 13%, #fff); border-color:' + o.tone + '; color:color-mix(in srgb, ' + o.tone + ' 60%, #000);"'
               : (o.inherited ? '' : ' style="background:' + o.color + '; color:' + o.ink + ';"')) + '>' +
+            (o.dispo === code ? '<span class="dispo-flag">Dispo</span>' : '') +
             (o.optPlp && code === 'PLP' ? '<span class="opt-flag">Opc.</span>' : '') +
             '<span class="code">' + code + '</span>' +
             '<span class="label">' + SHORT_LABEL[code] + '</span>' +
@@ -948,17 +1042,66 @@
   // PLP opcional (entrada directa a PDP): misma regla para Logi y para las filas de partners
   function isOptPlp(key) { return key === 'CRU' || key.indexOf('GRV') === 0 || key === 'PAQ_V+H'; }
 
+  // Paso donde se chequea la disponibilidad (el que se llamaba «Disponibilidad» en la nomenclatura antigua): CFG en CRU y GRV, PLP en V+H, Vuelos y Hoteles.
+  // F+H, T+H y todo Transportes (VUE, TRE, TRF, COC, FER) chequean en PLP, confirmado. El resto (CyE, SES, DIS, EPA, ACT, TRV) no se marca hasta confirmarlo.
+  var DISPO_STEP = {
+    CRU: 'CFG', GRV_COM: 'CFG', GRV_CIR: 'CFG', GRV_RUT: 'CFG',
+    'PAQ_V+H': 'PLP', 'PAQ_F+H': 'PLP', 'PAQ_T+H': 'PLP',
+    TRP_VUE: 'PLP', TRP_TRE: 'PLP', TRP_TRF: 'PLP', TRP_COC: 'PLP', TRP_FER: 'PLP',
+    HOT: 'PLP'
+  };
+
   fillHead('thead-main'); fillHead('thead-oth'); fillHead('thead-par'); fillHead('thead-biz');
 
   var bodyMain = document.getElementById('matrix-body');
   var bodyOth = document.getElementById('matrix-body-oth');
   var firstMain = true, firstOth = true;
+  // Fila con la etiqueta de una agrupación (GRV_ALL, PAQ_OWN…) que ocupa todo el ancho, sobre las filas que agrupa
+  function addGroupLabel(tbody, o) {
+    var tr = document.createElement('tr');
+    tr.className = 'group-label-row';
+    var th = document.createElement('th');
+    th.className = 'group-label';
+    th.colSpan = STEPS.length + 1;
+    th.innerHTML = o.plain ? '<div class="gl-inner plain"></div>' :
+      '<div class="gl-inner" style="--gl-color:' + o.color + ';"' + (o.title ? ' title="' + esc(o.title) + '"' : '') + '>' +
+        '<span class="gl-code" style="background:' + o.color + '; color:' + o.ink + ';">' + esc(o.code) + '</span>' +
+        '<span class="gl-text"><b>' + esc(o.name) + '</b> · ' + esc(o.what) + '</span>' +
+      '</div>';
+    tr.appendChild(th);
+    tbody.appendChild(tr);
+  }
+
+  var prevWasGroup = false;
   CATALOG.forEach(function (g) {
     var tbody = g.cross ? bodyOth : bodyMain;
     var multi = g.subs.length > 1;
+    var labelColor = g.tone || LINE_COLOR[g.line];
+    var labelInk = g.tone ? '#ffffff' : LINE_INK[g.line];
+    var emittedGroups = {};
+    // Línea sin agrupación justo después de un grupo con etiqueta: separador para que no parezca parte de él (HOT tras TRP_ALL).
+    // Entre líneas sueltas consecutivas (HOT, DIS, EPA, ACT) no hace falta.
+    if (!multi && !g.cross && prevWasGroup) addGroupLabel(tbody, { plain: true });
+    if (!g.cross) prevWasGroup = multi; // HOM, CHO y TRV van en otra tabla y no cuentan
+    // GRV y TRP: una etiqueta LINEA_ALL. PAQ no tiene PAQ_ALL: etiqueta PAQ_OWN y PAQ_TER sobre cada grupo
+    if (multi && !g.groups) {
+      addGroupLabel(tbody, {
+        color: labelColor, ink: labelInk, code: g.line + '_ALL', name: g.name,
+        what: 'todas las sublíneas (' + g.subs.map(function (s) { return s.code; }).join(', ') + ')',
+        title: g.line + '_ALL cubre todas las sublíneas de ' + g.name
+      });
+    }
     g.subs.forEach(function (sub, i) {
       var key = subKey(g, sub);
       var isFirst = i === 0;
+      if (multi && g.groups && sub.group && !emittedGroups[sub.group]) {
+        emittedGroups[sub.group] = true;
+        addGroupLabel(tbody, {
+          color: labelColor, ink: labelInk, code: g.line + '_' + sub.group, name: g.groups[sub.group],
+          what: g.subs.filter(function (s) { return s.group === sub.group; }).map(function (s) { return s.code; }).join(', '),
+          title: g.line + '_' + sub.group + ' agrupa las sublíneas de ' + g.groups[sub.group].toLowerCase()
+        });
+      }
       var gap = isFirst && (g.cross ? !firstOth : !firstMain);
       addRow(tbody, {
         color: g.tone || LINE_COLOR[g.line], ink: g.tone ? '#ffffff' : LINE_INK[g.line],
@@ -966,7 +1109,7 @@
         badge: sub.star ? '<span class="chip">Principal</span>' : '',
         title: sub.url ? 'https://www.' + sub.url : '',
         steps: toSet(sub.steps), gap: gap,
-        optPlp: isOptPlp(key)
+        optPlp: isOptPlp(key), dispo: DISPO_STEP[key]
       });
       if (isFirst) { if (g.cross) firstOth = false; else firstMain = false; }
     });
@@ -983,7 +1126,7 @@
         title: p.url ? 'https://' + p.url : '',
         badge: i === 0 && p.lines.length > 1 ? '<span class="chip">' + p.lines.length + ' líneas</span>' : '',
         steps: toSet(STEPS_BY_KEY[k]), inherited: true, gap: i === 0 && pi > 0,
-        optPlp: isOptPlp(k)
+        optPlp: isOptPlp(k), dispo: DISPO_STEP[k]
       });
     });
   });
@@ -1007,6 +1150,78 @@
     var nSubs = ALL_KEYS.length;
     pill.textContent = CATALOG.length + ' líneas · ' + nSubs + ' sublíneas · ' + PARTNERS.length + ' partners · Liverpool aparte';
   }
+
+  // Sección 07: eventos de funnel, generados del catálogo. Formato: LINEA[_SUBLINEA] - Nº - PÁGINA - Nombre
+  (function () {
+    var grid = document.getElementById('events-grid');
+    if (!grid) return;
+    function eventsFor(key, steps) {
+      return steps.map(function (c, i) { return key + ' - ' + (i + 1) + ' - ' + c + ' - ' + SHORT_LABEL[c]; });
+    }
+    function copyText(text, done) {
+      function fallback() {
+        var area = document.createElement('textarea');
+        area.value = text; area.setAttribute('readonly', '');
+        area.style.position = 'fixed'; area.style.left = '-9999px';
+        document.body.appendChild(area); area.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) {}
+        area.remove();
+        if (ok) done();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(fallback);
+      else fallback();
+    }
+
+    var cards = [];
+    CATALOG.forEach(function (g) {
+      var color = g.tone || LINE_COLOR[g.line];
+      var ink = g.tone ? '#ffffff' : LINE_INK[g.line];
+      // unión de los pasos de varias sublíneas, en el orden canónico
+      function unionSteps(list) {
+        return STEPS.filter(function (c) { return list.some(function (s) { return s.steps.indexOf(c) !== -1; }); });
+      }
+      if (g.subs.length > 1 && !g.groups) {
+        // LINEA_ALL (GRV, TRP): sus sublíneas tienen los mismos pasos
+        var all = g.line + '_ALL';
+        cards.push({ key: all, name: 'Todo ' + g.name, color: color, ink: ink, events: eventsFor(all, unionSteps(g.subs)) });
+      }
+      var emitted = {};
+      g.subs.forEach(function (sub) {
+        // Paquetes: no hay PAQ_ALL; en su lugar un funnel por grupo (PAQ_OWN, PAQ_TER)
+        if (sub.group && !emitted[sub.group]) {
+          emitted[sub.group] = true;
+          var gk = g.line + '_' + sub.group;
+          var members = g.subs.filter(function (s) { return s.group === sub.group; });
+          cards.push({ key: gk, name: g.groups[sub.group], color: color, ink: ink, events: eventsFor(gk, unionSteps(members)) });
+        }
+        var k = subKey(g, sub);
+        cards.push({ key: k, name: sub.name, color: color, ink: ink, events: eventsFor(k, sub.steps) });
+      });
+    });
+
+    cards.forEach(function (c) {
+      var card = document.createElement('div');
+      card.className = 'card event-card';
+      card.innerHTML =
+        '<div class="event-card-head">' +
+          '<span class="row-head-code" style="background:' + c.color + '; color:' + c.ink + ';">' + esc(c.key) + '</span>' +
+          '<span class="ev-name">' + esc(c.name) + '</span>' +
+          '<span class="ev-count">' + c.events.length + ' eventos</span>' +
+          '<button type="button" class="ev-copy">Copiar</button>' +
+        '</div>' +
+        '<ul class="ev-list">' + c.events.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>' +
+        (c.note ? '<p class="ev-note">' + esc(c.note) + '</p>' : '');
+      var btn = card.querySelector('.ev-copy');
+      btn.addEventListener('click', function () {
+        copyText(c.events.join('\n'), function () {
+          btn.textContent = 'Copiado ✓';
+          setTimeout(function () { btn.textContent = 'Copiar'; }, 1400);
+        });
+      });
+      grid.appendChild(card);
+    });
+  })();
 
   // Líneas, grupos y sublíneas disponibles en el constructor de segmentación (sección 05)
   // Las líneas con varias sublíneas (GRV, PAQ, TRP) nunca van solas: ofrecen LINEA_ALL (todas), y las sublíneas con `group`
@@ -1271,6 +1486,115 @@
     btn.textContent = 'Copiado ✓';
     setTimeout(function () { btn.textContent = original; }, 1400);
   });
+})();
+</script>
+
+<!-- ---- Secciones plegables: el contenido de cada <section> (todo menos la cabecera) pasa a un .sec-body que se pliega al pulsar la cabecera ---- -->
+<script>
+(function () {
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.wrap > section'));
+
+  function setOpen(sec, open) {
+    sec.classList.toggle('collapsed', !open);
+    var head = sec.querySelector('.section-head');
+    if (head) head.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  sections.forEach(function (sec) {
+    var head = sec.querySelector('.section-head');
+    if (!head) return;
+    // Si el HTML viene exportado desde el modo edición, el envoltorio ya existe: no se duplica
+    if (!sec.querySelector('.sec-body')) {
+      var body = document.createElement('div');
+      body.className = 'sec-body';
+      Array.prototype.slice.call(sec.children).forEach(function (el) { if (el !== head) body.appendChild(el); });
+      sec.appendChild(body);
+    }
+    if (!head.querySelector('.sec-chevron')) {
+      var chev = document.createElement('span');
+      chev.className = 'sec-chevron';
+      chev.setAttribute('aria-hidden', 'true');
+      chev.textContent = '▾';
+      head.appendChild(chev);
+    }
+    // Botón que copia el enlace directo a la sección (URL + #id)
+    if (sec.id && !head.querySelector('.sec-link')) {
+      var link = document.createElement('button');
+      link.type = 'button';
+      link.className = 'sec-link';
+      link.setAttribute('aria-label', 'Copiar enlace a esta sección');
+      link.setAttribute('title', 'Copiar enlace a esta sección');
+      link.textContent = '🔗';
+      link.addEventListener('click', function (e) {
+        e.stopPropagation(); // no plegar la sección al copiar
+        var url = location.href.split('#')[0] + '#' + sec.id;
+        function done() {
+          link.classList.add('copied'); link.textContent = '✓';
+          setTimeout(function () { link.classList.remove('copied'); link.textContent = '🔗'; }, 1400);
+        }
+        function fallback() {
+          var area = document.createElement('textarea');
+          area.value = url; area.setAttribute('readonly', '');
+          area.style.position = 'fixed'; area.style.left = '-9999px';
+          document.body.appendChild(area); area.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (err) {}
+          area.remove();
+          if (ok) done();
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done).catch(fallback);
+        else fallback();
+        history.replaceState(null, '', '#' + sec.id);
+      });
+      head.appendChild(link);
+    }
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    head.setAttribute('title', 'Plegar o desplegar la sección');
+    setOpen(sec, !sec.classList.contains('collapsed'));
+
+    function toggle() {
+      if (document.body.classList.contains('edit-mode')) return; // en edición, pulsar la cabecera solo coloca el cursor
+      setOpen(sec, sec.classList.contains('collapsed'));
+      syncAll();
+    }
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target === head) { e.preventDefault(); toggle(); }
+    });
+  });
+
+  // Enlace directo (#id): abre la sección aunque esté plegada y se desplaza hasta ella
+  function openFromHash() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+    var sec = sections.filter(function (s) { return s.id === id; })[0];
+    if (!sec) return;
+    setOpen(sec, true);
+    syncAll();
+    sec.scrollIntoView();
+  }
+  window.addEventListener('hashchange', openFromHash);
+  // al cargar, tras montar todo el contenido generado por JS (la altura de las secciones cambia)
+  window.addEventListener('load', openFromHash);
+
+  // Botón para plegar o desplegar todas a la vez
+  var tools = document.createElement('div');
+  tools.className = 'sec-tools';
+  var allBtn = document.createElement('button');
+  allBtn.type = 'button';
+  tools.appendChild(allBtn);
+  if (sections.length) sections[0].parentNode.insertBefore(tools, sections[0]);
+
+  function anyOpen() { return sections.some(function (s) { return !s.classList.contains('collapsed'); }); }
+  function syncAll() { allBtn.textContent = anyOpen() ? 'Plegar todas' : 'Desplegar todas'; }
+  allBtn.addEventListener('click', function () {
+    var open = !anyOpen();
+    sections.forEach(function (s) { setOpen(s, open); });
+    syncAll();
+  });
+  syncAll();
+  openFromHash();
 })();
 </script>
 
