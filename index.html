@@ -408,6 +408,10 @@
   .ev-list { margin: 0; padding: 0; list-style: none; font-family: ui-monospace, monospace; font-size: 12px; color: var(--text-primary); }
   .ev-list li { padding: 4px 8px; border-radius: 4px; white-space: nowrap; overflow-x: auto; }
   .ev-list li:nth-child(odd) { background: var(--page-plane); }
+  .ev-mode-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; background: var(--page-plane); border: 1px solid var(--gridline); border-radius: 8px; padding: 10px 14px; }
+  .ev-mode-desc b { color: var(--text-primary); }
+  .ev-mode-desc .pro { color: #0a7a0a; }
+  .ev-mode-desc .con { color: #a06600; }
   .ev-note { margin: 10px 0 0; font-size: 11.5px; color: #a06600; background: #fff7db; border: 1px solid #f3e2ac; border-radius: 6px; padding: 6px 9px; }
   @media (max-width: 1000px) { .event-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 640px) { .event-grid { grid-template-columns: 1fr; } }
@@ -805,11 +809,14 @@
       <p>Cada paso de cada funnel tiene un evento propio. Se nombra igual en AB Tasty y en Quantum para poder cruzar el análisis de los tests con el del rendimiento de la web. La lista se genera del mismo catálogo que la matriz de la sección 03.</p>
     </div>
     <div class="card tracker-card" style="margin-bottom: 16px;">
-      <h4>Patrón</h4>
-      <div class="tracker-pattern">LINEA[_SUBLINEA] - Nº - PÁGINA - Nombre</div>
+      <h4>Numeración del paso: tres opciones por decidir</h4>
+      <div class="view-toggle" id="ev-mode-toggle" role="group" aria-label="Opción de numeración"></div>
+      <div class="ev-mode-desc" id="ev-mode-desc"></div>
+      <h4 style="margin-top: 18px;">Patrón</h4>
+      <div class="tracker-pattern" id="ev-pattern">LINEA[_SUBLINEA] - Nº - PÁGINA - Nombre</div>
       <p class="tracker-example">
-        Ejemplos: <code>HOT - 2 - PLP - Listado</code> · <code>PAQ_V+H - 4 - TRA - Transporte</code> · <code>CRU - 4 - CFG - Configuración</code><br>
-        · <b>Nº</b> es el orden del paso dentro de su funnel, empezando en 1 por el Escaparate o, si no lo tiene, por el primer paso.<br>
+        Ejemplos: <span id="ev-examples"></span><br>
+        · <b id="ev-numlabel">Nº</b> <span id="ev-numrule"></span><br>
         · <b>PÁGINA</b> y <b>Nombre</b> salen del diccionario de la sección 04.<br>
         · El <b>dispositivo no va en el nombre</b>: se segmenta aparte en cada herramienta.<br>
         · Sin <code>|</code>, para no confundirlos con los trackers de clic (sección 06) ni con el código de segmentación (sección 05).<br>
@@ -1155,8 +1162,50 @@
   (function () {
     var grid = document.getElementById('events-grid');
     if (!grid) return;
+    // Tres formas de numerar el paso (por decidir). Las tarjetas se redibujan al elegir una.
+    var MODES = {
+      seq: {
+        label: 'A · Secuencial',
+        pattern: 'LINEA[_SUBLINEA] - Nº - PÁGINA - Nombre',
+        examples: ['HOT - 2 - PLP - Listado', 'PAQ_V+H - 4 - TRA - Transporte', 'CRU - 4 - CFG - Configuración'],
+        numLabel: 'Nº',
+        numRule: 'es el orden del paso dentro de su funnel, empezando en 1 por el Escaparate o, si no lo tiene, por el primer paso.',
+        pro: 'Sin huecos: cada funnel va de 1 a N y se lee como una lista.',
+        con: 'Si se añade o se quita un paso en una línea, los números siguientes cambian y hay que renombrar eventos con histórico en Quantum. Además el mismo paso tiene números distintos según la línea (el checkout es 4, 5, 6 o 7).'
+      },
+      canon: {
+        label: 'B · Posición canónica',
+        pattern: 'LINEA[_SUBLINEA] - Nº - PÁGINA - Nombre',
+        examples: ['HOT - 2 - PLP - Listado', 'PAQ_V+H - 5 - TRA - Transporte', 'TRP_VUE - 8 - CHK - Checkout'],
+        numLabel: 'Nº',
+        numRule: 'es la posición del paso en el funnel estándar y es la misma en todas las líneas: ESC 1, PLP 2, PDP 3, CFG 4, TRA 5, XTR 6, PRE 7, CHK 8, WAI 9. Los pasos que una línea no tiene dejan hueco.',
+        pro: 'El número de un paso nunca cambia: <code>CHK</code> es siempre 8 en todas las líneas, y añadir o quitar un paso no obliga a renombrar nada. Conserva el orden.',
+        con: 'Salen huecos en los funnels cortos (Vuelos queda 1, 2, 8, 9). Un hueco indica que ese funnel no tiene ese paso, pero puede despistar a quien no conozca la regla.'
+      },
+      none: {
+        label: 'C · Sin número',
+        pattern: 'LINEA[_SUBLINEA] - PÁGINA - Nombre',
+        examples: ['HOT - PLP - Listado', 'PAQ_V+H - TRA - Transporte', 'CRU - CFG - Configuración'],
+        numLabel: 'Orden',
+        numRule: 'no va en el nombre: lo da la página (ESC → PLP → PDP → CFG → TRA → XTR → PRE → CHK → WAI), y el funnel se ordena al montarlo en Quantum. Aquí las tarjetas siguen ese orden.',
+        pro: 'El nombre no se rompe nunca, hace falta decidir menos y es el más corto.',
+        con: 'No se ordena solo por nombre en las listas de AB Tasty y Quantum (alfabéticamente <code>CHK</code> sale antes que <code>PLP</code>): el orden hay que ponerlo a mano al montar cada funnel.'
+      }
+    };
+    var MODE_ORDER = ['seq', 'canon', 'none'];
+    var mode = 'seq';
+
+    // Número del paso según la opción elegida; null si no lleva
+    function stepNumber(c, i) {
+      if (mode === 'seq') return i + 1;
+      if (mode === 'canon') return STEPS.indexOf(c) + 1;
+      return null;
+    }
     function eventsFor(key, steps) {
-      return steps.map(function (c, i) { return key + ' - ' + (i + 1) + ' - ' + c + ' - ' + SHORT_LABEL[c]; });
+      return steps.map(function (c, i) {
+        var n = stepNumber(c, i);
+        return key + ' - ' + (n === null ? '' : n + ' - ') + c + ' - ' + SHORT_LABEL[c];
+      });
     }
     function copyText(text, done) {
       function fallback() {
@@ -1184,7 +1233,7 @@
       if (g.subs.length > 1 && !g.groups) {
         // LINEA_ALL (GRV, TRP): sus sublíneas tienen los mismos pasos
         var all = g.line + '_ALL';
-        cards.push({ key: all, name: 'Todo ' + g.name, color: color, ink: ink, events: eventsFor(all, unionSteps(g.subs)) });
+        cards.push({ key: all, name: 'Todo ' + g.name, color: color, ink: ink, steps: unionSteps(g.subs) });
       }
       var emitted = {};
       g.subs.forEach(function (sub) {
@@ -1193,34 +1242,68 @@
           emitted[sub.group] = true;
           var gk = g.line + '_' + sub.group;
           var members = g.subs.filter(function (s) { return s.group === sub.group; });
-          cards.push({ key: gk, name: g.groups[sub.group], color: color, ink: ink, events: eventsFor(gk, unionSteps(members)) });
+          cards.push({ key: gk, name: g.groups[sub.group], color: color, ink: ink, steps: unionSteps(members) });
         }
         var k = subKey(g, sub);
-        cards.push({ key: k, name: sub.name, color: color, ink: ink, events: eventsFor(k, sub.steps) });
+        cards.push({ key: k, name: sub.name, color: color, ink: ink, steps: sub.steps });
       });
     });
 
-    cards.forEach(function (c) {
-      var card = document.createElement('div');
-      card.className = 'card event-card';
-      card.innerHTML =
-        '<div class="event-card-head">' +
-          '<span class="row-head-code" style="background:' + c.color + '; color:' + c.ink + ';">' + esc(c.key) + '</span>' +
-          '<span class="ev-name">' + esc(c.name) + '</span>' +
-          '<span class="ev-count">' + c.events.length + ' eventos</span>' +
-          '<button type="button" class="ev-copy">Copiar</button>' +
-        '</div>' +
-        '<ul class="ev-list">' + c.events.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>' +
-        (c.note ? '<p class="ev-note">' + esc(c.note) + '</p>' : '');
-      var btn = card.querySelector('.ev-copy');
-      btn.addEventListener('click', function () {
-        copyText(c.events.join('\n'), function () {
-          btn.textContent = 'Copiado ✓';
-          setTimeout(function () { btn.textContent = 'Copiar'; }, 1400);
+    var toggle = document.getElementById('ev-mode-toggle');
+    var desc = document.getElementById('ev-mode-desc');
+
+    function renderCards() {
+      grid.innerHTML = '';
+      cards.forEach(function (c) {
+        var events = eventsFor(c.key, c.steps);
+        var card = document.createElement('div');
+        card.className = 'card event-card';
+        card.innerHTML =
+          '<div class="event-card-head">' +
+            '<span class="row-head-code" style="background:' + c.color + '; color:' + c.ink + ';">' + esc(c.key) + '</span>' +
+            '<span class="ev-name">' + esc(c.name) + '</span>' +
+            '<span class="ev-count">' + events.length + ' eventos</span>' +
+            '<button type="button" class="ev-copy">Copiar</button>' +
+          '</div>' +
+          '<ul class="ev-list">' + events.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>' +
+          (c.note ? '<p class="ev-note">' + esc(c.note) + '</p>' : '');
+        var btn = card.querySelector('.ev-copy');
+        btn.addEventListener('click', function () {
+          copyText(events.join('\n'), function () {
+            btn.textContent = 'Copiado ✓';
+            setTimeout(function () { btn.textContent = 'Copiar'; }, 1400);
+          });
         });
+        grid.appendChild(card);
       });
-      grid.appendChild(card);
+    }
+
+    // Actualiza el selector, la descripción, el patrón, los ejemplos y las tarjetas con la opción elegida
+    function setMode(m) {
+      mode = m;
+      var d = MODES[m];
+      [].slice.call(toggle.querySelectorAll('button')).forEach(function (b) {
+        var on = b.getAttribute('data-mode') === m;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      desc.innerHTML = '<span class="pro"><b>Ventaja:</b> ' + d.pro + '</span><br><span class="con"><b>Inconveniente:</b> ' + d.con + '</span>';
+      document.getElementById('ev-pattern').textContent = d.pattern;
+      document.getElementById('ev-examples').innerHTML = d.examples.map(function (e) { return '<code>' + esc(e) + '</code>'; }).join(' · ');
+      document.getElementById('ev-numlabel').textContent = d.numLabel;
+      document.getElementById('ev-numrule').textContent = d.numRule;
+      renderCards();
+    }
+
+    MODE_ORDER.forEach(function (m) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('data-mode', m);
+      b.textContent = MODES[m].label;
+      b.addEventListener('click', function () { setMode(m); });
+      toggle.appendChild(b);
     });
+    setMode(mode);
   })();
 
   // Líneas, grupos y sublíneas disponibles en el constructor de segmentación (sección 05)
