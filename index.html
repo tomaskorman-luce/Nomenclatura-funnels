@@ -44,6 +44,10 @@
     --line-biz: #0f8a7e;
     --line-biz-soft: #e2f4f1;
     --line-biz-ink: #ffffff;
+    /* APP de Logitravel: réplica de todas las líneas, entradas y transversales; bloque aparte como Liverpool */
+    --line-app: #1f2937;
+    --line-app-soft: #e8eaee;
+    --line-app-ink: #ffffff;
 
     --brand: #005591; /* marca Logitravel, solo para chrome/UI, nunca como color de dato */
     --brand-subtle: #def0fc;
@@ -187,6 +191,7 @@
   .matrix-table.wide .row-head-inner { height: 56px; padding: 0 8px; gap: 8px; }
   .step-cell.inherited { background: var(--line-par-soft); border: 1.5px solid var(--line-par); color: #3d2a8c; }
   .step-cell.inherited.biz { background: var(--line-biz-soft); border-color: var(--line-biz); color: #0b4f49; }
+  .step-cell.inherited.app { background: var(--line-app-soft); border-color: var(--line-app); color: #111827; }
   .view-toggle { display: inline-flex; border: 1.5px solid var(--gridline); border-radius: 9999px; padding: 3px; background: var(--page-plane); margin-bottom: 16px; }
   .view-toggle button { font: inherit; font-size: 12.5px; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); padding: 6px 14px; border-radius: 9999px; cursor: pointer; }
   .view-toggle button.active { background: var(--brand); color: #fff; }
@@ -550,6 +555,17 @@
     </div>
 
     <div class="card sub-card">
+      <div class="card-kicker" style="color: var(--line-app);">App de Logitravel</div>
+      <h3>La APP replica todo lo que ya existe en Logi: líneas, entradas y transversales</h3>
+      <p class="card-lead">La APP (<code>APP</code>) no es una línea ni una sublínea: es un canal propio que <b>reproduce el negocio de Logitravel completo</b>. Se muestra como bloque aparte con la unión de todos los funnels, y por eso <b>da cuenta de todo lo anterior</b>: las líneas y sublíneas con funnel de producto, las entradas (<code>HOM</code>, <code>CHO</code>) y los transversales (<code>TRV</code>). Su tratamiento en el ID y en el código de segmentación está por definir.</p>
+      <table class="matrix-table wide" id="matrix-table-app">
+        <thead id="thead-app"></thead>
+        <tbody id="matrix-body-app"></tbody>
+      </table>
+      <p class="hint-hover" id="app-scope"></p>
+    </div>
+
+    <div class="card sub-card">
       <div class="card-kicker">Partners</div>
       <h3>El partner va en el ID de la hipótesis; su funnel es el de cada línea que contrata</h3>
       <p class="card-lead">Un partner no es una línea ni una sublínea: se identifica por el <b>prefijo del ID</b> de la hipótesis en CRO Hub (<code>LOGI-0253</code> → <code>MEL-0254</code>, <code>PAW-0256</code>), elegido con selector al crearla. En el código de segmentación el campo LINEA lleva la línea de producto con la nomenclatura de funnel de siempre (<code>PAQ_V+H</code>, <code>HOT</code>…), igual que en Logitravel. Cada partner tiene <b>una fila por línea contratada</b> (por ejemplo, Por Aventura tiene <code>PAQ_V+H</code> y <code>PAQ_T+H</code>; Balearia, <code>PAQ_F+H</code> y <code>HOT</code>), con el funnel de esa línea. Cada partner tiene su propio color, para ver de un vistazo qué filas son suyas.</p>
@@ -845,6 +861,7 @@
     HOT: 'var(--line-hot)',
     PAR: 'var(--line-par)',
     BIZ: 'var(--line-biz)',
+    APP: 'var(--line-app)',
     OTH: 'var(--line-oth)'
   };
   var LINE_INK = {
@@ -856,6 +873,7 @@
     HOT: 'var(--line-hot-ink)',
     PAR: 'var(--line-par-ink)',
     BIZ: 'var(--line-biz-ink)',
+    APP: 'var(--line-app-ink)',
     OTH: 'var(--line-oth-ink)'
   };
 
@@ -979,6 +997,9 @@
   // Liverpool no es partner sino otro negocio: va aparte y contrata todas las líneas
   var BUSINESS = { code: 'LIV', name: 'Liverpool', url: 'viajesci.liverpool.com.mx', lines: ['ALL'] };
 
+  // APP de Logitravel: réplica de todo lo que existe en Logi (líneas, sublíneas, entradas y transversales); mismo tratamiento que Liverpool
+  var APP = { code: 'APP', name: 'APP', sub: 'App de Logitravel' };
+
   function subKey(group, sub) { return group.subs.length === 1 ? group.line : group.line + '_' + sub.code; }
 
   var STEPS_BY_KEY = {};
@@ -1027,7 +1048,7 @@
       if (o.steps[code]) {
         var tip = (o.tips && o.tips[code]) ? DEFINITION[code] + ' · Procede de: ' + o.tips[code] : DEFINITION[code];
         td.innerHTML =
-          '<div class="step-cell compact' + (o.inherited ? ' inherited' : '') + (o.biz ? ' biz' : '') + '" title="' + esc(tip) + '"' +
+          '<div class="step-cell compact' + (o.inherited ? ' inherited' : '') + (o.biz ? ' ' + o.biz : '') + '" title="' + esc(tip) + '"' +
             (o.tone
               ? ' style="background:color-mix(in srgb, ' + o.tone + ' 13%, #fff); border-color:' + o.tone + '; color:color-mix(in srgb, ' + o.tone + ' 60%, #000);"'
               : (o.inherited ? '' : ' style="background:' + o.color + '; color:' + o.ink + ';"')) + '>' +
@@ -1058,7 +1079,7 @@
     HOT: 'PLP'
   };
 
-  fillHead('thead-main'); fillHead('thead-oth'); fillHead('thead-par'); fillHead('thead-biz');
+  fillHead('thead-main'); fillHead('thead-oth'); fillHead('thead-par'); fillHead('thead-biz'); fillHead('thead-app');
 
   var bodyMain = document.getElementById('matrix-body');
   var bodyOth = document.getElementById('matrix-body-oth');
@@ -1148,14 +1169,39 @@
       chip: BUSINESS.code, name: BUSINESS.name, sub: BUSINESS.url,
       title: 'https://' + BUSINESS.url,
       badge: '<span class="chip">Todas las líneas</span>',
-      steps: steps, inherited: true, biz: true
+      steps: steps, inherited: true, biz: 'biz'
     });
+  })();
+
+  // APP: réplica de todo Logi, unión de los pasos de todas las líneas, entradas y transversales
+  (function () {
+    var steps = {};
+    ALL_KEYS.forEach(function (k) { STEPS_BY_KEY[k].forEach(function (c) { steps[c] = true; }); });
+    addRow(document.getElementById('matrix-body-app'), {
+      color: LINE_COLOR.APP, ink: LINE_INK.APP,
+      chip: APP.code, name: APP.name, sub: APP.sub,
+      badge: '<span class="chip">Réplica de Logi</span>',
+      steps: steps, inherited: true, biz: 'app'
+    });
+    // Qué replica, generado del catálogo para que no se desincronice
+    var lines = [], entries = [], cross = [];
+    CATALOG.forEach(function (g) {
+      var codes = g.subs.length > 1 ? g.subs.map(function (s) { return g.line + '_' + s.code; }) : [g.line];
+      var txt = codes.map(function (c) { return '<code class="code-ex">' + c + '</code>'; }).join(' ');
+      if (g.line === 'HOM' || g.line === 'CHO') entries.push(txt);
+      else if (g.line === 'TRV') cross.push(txt);
+      else lines.push(txt);
+    });
+    document.getElementById('app-scope').innerHTML =
+      '💡 La APP incluye: <b>líneas y sublíneas</b> ' + lines.join(' ') +
+      ' · <b>entradas</b> ' + entries.join(' ') +
+      ' · <b>transversales</b> ' + cross.join(' ') + '.';
   })();
 
   var pill = document.getElementById('pill-lines');
   if (pill) {
     var nSubs = ALL_KEYS.length;
-    pill.textContent = CATALOG.length + ' líneas · ' + nSubs + ' sublíneas · ' + PARTNERS.length + ' partners · Liverpool aparte';
+    pill.textContent = CATALOG.length + ' líneas · ' + nSubs + ' sublíneas · ' + PARTNERS.length + ' partners · Liverpool y APP aparte';
   }
 
   // Sección 07: eventos de funnel, generados del catálogo. Formato: LINEA[_SUBLINEA] - Nº - PÁGINA - Nombre
